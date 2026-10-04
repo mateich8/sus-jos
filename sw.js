@@ -1,6 +1,6 @@
 // Network first, so a new version shows up as soon as there is signal; the cache only covers going offline
 // (the one-phone game still works without internet).
-const CACHE = 'susjos-v1';
+const CACHE = 'susjos-v2';
 const SHELL = ['./', './index.html', './board.jpg', './manifest.webmanifest', './lib/qrcode.js', './icons/icon-192.png'];
 
 self.addEventListener('install', e => {

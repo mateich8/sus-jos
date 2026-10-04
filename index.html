@@ -17,8 +17,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: felt-green marquee header with the board's patterned trim; lobby = board photo + "who plays" card, recent games + rules;
-   game = the real board photo with a START strip, turn bar under it, players/log beside it on wide screens and stacked on phones. */
+/* Layout: felt-green marquee header with the board's patterned trim. Lobby = two independent columns (board + how to play | you + your games).
+   Game = an app screen: on landscape screens the board fills the height and a side column holds the dice dock and tabbed details;
+   on portrait phones the board sits on top and the dice dock sticks to the bottom of the screen. */
 :root {
   --bg: #E6EEE4;
   --surface: #FFFFFF;
@@ -133,13 +134,6 @@ h1, h2, h3 { text-wrap: balance; }
 .pic-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Lobby */
-.lobby { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-areas: "hero me" "list rules"; gap: 20px; align-items: start; }
-.hero { grid-area: hero; margin: 0; }
-.hero img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: var(--shadow); }
-.me { grid-area: me; }
-.list { grid-area: list; }
-.rules { grid-area: rules; }
-@media (max-width: 900px) { .lobby { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "me" "list" "rules"; gap: 16px; } }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
 .actions .big { min-height: 54px; font-size: 18px; padding: 0 22px; flex: 1 1 180px; }
 .codeform { display: flex; gap: 8px; flex: 1 1 220px; }
@@ -179,17 +173,6 @@ h1, h2, h3 { text-wrap: balance; }
 .down .leg { background: color-mix(in srgb, var(--down) 13%, transparent); color: var(--down); }
 .privacy { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
 
-/* Game */
-.game { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 20px; align-items: start; }
-@media (max-width: 920px) { .game { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
-.gmain { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.board-wrap { position: relative; border-radius: 14px; overflow: hidden; background: var(--felt-deep); box-shadow: var(--shadow); }
-.board-scroll { overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
-#board { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
-.board-scroll.zoomed #board { width: 190%; }
-.zoom-btn { position: absolute; right: 6px; bottom: 3px; display: none; align-items: center; min-height: 26px; padding: 0 11px; border-radius: 999px; border: 0; background: var(--overlay-bg); color: var(--overlay-ink); font-weight: 600; font-size: 13px; cursor: pointer; }
-@media (max-width: 920px) { .zoom-btn { display: inline-flex; } .strip-hint { display: none; } }
 .win { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 8px; border-radius: 999px; background: var(--canary); color: var(--canary-ink); border: 2px solid var(--canary-ink); box-shadow: 0 4px 0 var(--canary-ink); font-family: var(--font-display); font-size: clamp(14px, 3.2vw, 22px); white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; pointer-events: none; }
 #confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
@@ -206,8 +189,6 @@ h1, h2, h3 { text-wrap: balance; }
 .fx-label.up { fill: var(--fx-up); }
 .fx-label.down { fill: var(--fx-down); }
 
-.turnbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; transition: box-shadow .25s, border-color .25s; }
-.turnbar.mine { border-color: var(--canary-deep); box-shadow: 0 0 0 3px color-mix(in srgb, var(--canary) 60%, transparent); }
 .turn-text { min-width: 0; }
 .turn-main { margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
 .turn-sub { margin: 5px 0 0; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
@@ -216,14 +197,6 @@ h1, h2, h3 { text-wrap: balance; }
 .turn-sub .down, .log .down { color: var(--down); font-weight: 600; }
 .turn-sub .warn { color: var(--down); font-weight: 600; }
 .code-inline { font-family: var(--font-display); font-weight: 400; letter-spacing: .06em; }
-.turn-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
-.roll { min-height: 56px; font-size: 18px; padding: 0 22px; }
-@media (max-width: 600px) {
-  .turnbar { grid-template-columns: auto minmax(0, 1fr); padding: 12px; }
-  .turn-actions { grid-column: 1 / -1; }
-  .turn-main { font-size: 18px; }
-}
-
 .die { width: 58px; height: 58px; flex: none; background: var(--die-bg); border: 2px solid var(--die-edge); border-radius: 13px; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .09), 0 3px 8px rgba(0, 0, 0, .2); display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 7px; }
 .die i { width: 11px; height: 11px; border-radius: 50%; place-self: center; }
 .die i.on { background: var(--pip); }
@@ -252,7 +225,7 @@ h1, h2, h3 { text-wrap: balance; }
 .pl-pos b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--ink); }
 .mypic { margin-top: 10px; }
 
-.log { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow: auto; display: flex; flex-direction: column; gap: 7px; font-size: 14.5px; color: var(--muted); }
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; font-size: 14.5px; color: var(--muted); }
 .log li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; align-items: start; }
 .toggle { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; padding: 6px 0; cursor: pointer; }
 .toggle input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--felt); }
@@ -289,7 +262,7 @@ h1, h2, h3 { text-wrap: balance; }
 
 
 /* Accessories, reactions, surprises */
-.acc-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 8px; }
+.acc-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .sw.acc img { width: 30px; height: 30px; display: block; }
 .acc-none { font-size: 20px; color: var(--muted); }
 .turn-sub .sur, .log .sur { color: var(--sur); font-weight: 600; }
@@ -353,6 +326,98 @@ table.stats { width: 100%; border-collapse: collapse; font-size: 14px; font-vari
 .qr svg { display: block; width: 100%; height: auto; }
 .share-code { margin: 0; font-family: var(--font-display); font-size: 24px; letter-spacing: .08em; color: var(--felt); }
 .modal-card .sp-row { justify-content: center; margin: 0; }
+
+/* ================= Layout ================= */
+:root { --hdr: 63px; --gap: 16px; }
+.mq-in { min-height: 56px; padding-block: 8px; }
+body.in-game .mq-in, body.in-game .wrap { max-width: 2000px; }
+.turn-main { font-size: clamp(16px, 0.6vw + 12px, 20px); }
+
+/* Lobby: two columns that stack independently, so a tall card never leaves a hole beside the board */
+.lobby { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 20px; align-items: start; }
+.lcol, .rcol { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.hero { margin: 0; }
+@media (max-width: 860px) {
+  .lobby { display: flex; flex-direction: column; gap: 16px; }
+  .lcol, .rcol { display: contents; }
+  .hero { order: 1; }
+  .me { order: 2; }
+  .list { order: 3; }
+  .rules { order: 4; }
+}
+
+/* Game, portrait first: board on top, the dice dock right under it and stuck to the bottom of the screen while scrolling */
+.game { display: flex; flex-direction: column; gap: 12px; }
+.stage { min-width: 0; }
+.board-wrap { position: relative; width: 100%; margin-inline: auto; border-radius: 14px; overflow: hidden; background: var(--felt-deep); box-shadow: var(--shadow); container-type: inline-size; }
+.board-scroll { aspect-ratio: 1260 / 898; overflow: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.board-scroll.zoomed { overflow: auto; }
+#board { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+.board-scroll.zoomed #board { width: 200%; }
+.zoom-btn { position: absolute; right: 6px; bottom: 4px; display: none; align-items: center; min-height: 26px; padding: 0 11px; border-radius: 999px; border: 0; background: var(--overlay-bg); color: var(--overlay-ink); font-weight: 600; font-size: 13px; cursor: pointer; z-index: 3; }
+@container (max-width: 680px) { .zoom-btn { display: inline-flex; } .strip-hint { display: none; } }
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; container-type: inline-size; }
+.dock { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 6; display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; box-shadow: var(--shadow); transition: box-shadow .25s, border-color .25s; }
+.dock.mine { border-color: var(--canary-deep); box-shadow: 0 0 0 3px color-mix(in srgb, var(--canary) 60%, transparent), var(--shadow); }
+.turnbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; }
+.turn-actions { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; }
+.turn-actions .btn { width: 100%; }
+.roll { min-height: 54px; font-size: 18px; }
+.react-row { flex-wrap: nowrap; gap: 6px; }
+.react-btn { width: 40px; height: 40px; }
+.react-btn img { width: 26px; height: 26px; }
+.phr-btn { min-height: 40px; }
+@container (max-width: 330px) { .react-btn { width: 34px; height: 34px; } .react-btn img { width: 22px; height: 22px; } .phr-btn { padding: 0 10px; } }
+
+.join .join-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+@container (min-width: 560px) { .join .join-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px; } }
+
+/* One panel with tabs instead of a stack of cards */
+.panel { display: flex; flex-direction: column; min-height: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.tabs { display: flex; gap: 4px; padding: 6px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; border: 0; border-radius: 10px; background: transparent; padding: 0 10px; font-weight: 600; font-size: 14.5px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab[aria-selected="true"] { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 -3px 0 var(--canary-deep); }
+.tab .count { font-weight: 500; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (hover: hover) { .tab:hover { color: var(--ink); } }
+.pane { padding: 12px 14px 14px; min-height: 0; }
+.pane .players, .pane .log { margin: 0; }
+.pane .quiet { margin-top: 14px; }
+.wins { font-size: 12.5px; font-weight: 600; color: var(--canary-ink); background: var(--canary); border-radius: 999px; padding: 1px 8px; margin-left: 6px; white-space: nowrap; }
+
+/* Landscape screens (laptops, desktops, tablets and phones on their side): no page scroll during a game,
+   the board grows to the height that is left and the side column scrolls inside its tabs */
+@media (min-width: 620px) and (min-aspect-ratio: 23/20) {
+  body.in-game { height: 100vh; height: 100dvh; overflow: hidden; }
+  body.in-game .wrap { height: calc(100vh - var(--hdr) - env(safe-area-inset-top, 0px)); height: calc(100dvh - var(--hdr) - env(safe-area-inset-top, 0px)); padding-block: 12px; }
+  .game { flex-direction: row; align-items: stretch; height: 100%; gap: var(--gap); }
+  .stage { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
+  .board-wrap { width: min(100%, calc((100vh - var(--hdr) - 24px - env(safe-area-inset-top, 0px)) * 1260 / 898)); width: min(100%, calc((100dvh - var(--hdr) - 24px - env(safe-area-inset-top, 0px)) * 1260 / 898)); }
+  .side { flex: none; width: clamp(270px, 27vw, 390px); height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .dock { position: static; box-shadow: none; }
+  .panel { flex: 1 0 240px; }
+  .pane { flex: 1; overflow: auto; overscroll-behavior: contain; }
+}
+/* Short screens (phones on their side): slimmer header and dock */
+@media (max-height: 520px) {
+  :root { --hdr: 51px; }
+  .mq-in { min-height: 44px; padding-block: 4px; }
+  .logo { font-size: 21px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .back { min-height: 34px; }
+  .dock { padding: 8px 10px; gap: 6px; }
+  .die { width: 44px; height: 44px; padding: 5px; }
+  .die i { width: 8px; height: 8px; }
+  .roll { min-height: 44px; font-size: 16px; }
+  .turn-sub { font-size: 13.5px; }
+}
+/* Very narrow phones */
+@media (max-width: 360px) {
+  .wrap { padding-inline: 10px; }
+  .card { padding: 14px; }
+  .swatches { gap: 6px; }
+}
 </style>
 </head>
 <body>
@@ -385,64 +450,66 @@ table.stats { width: 100%; border-collapse: collapse; font-size: 14px; font-vari
 
 <main class="wrap">
   <section id="vLobby" class="lobby">
-    <figure class="hero">
-      <svg id="heroBoard" viewBox="0 0 1260 818" role="img" aria-label="Tabla Sus-Jos: 120 de căsuțe, săgeți care urcă și coboară, cu animale de circ"></svg>
-    </figure>
+    <div class="lcol">
+      <figure class="hero">
+        <svg id="heroBoard" viewBox="0 0 1260 818" role="img" aria-label="Tabla Sus-Jos: 120 de căsuțe, săgeți care urcă și coboară, cu animale de circ"></svg>
+      </figure>
+      <div class="card rules">
+        <h2>Cum se joacă</h2>
+        <ol class="howto">
+          <li>Toți pornesc de la START. La rândul tău dai cu zarul și muți pionul atâtea căsuțe.</li>
+          <li>Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori.</li>
+          <li>Dacă ajungi pe o căsuță unde stă deja cineva, zarul se anulează: te întorci unde erai și trece rândul.</li>
+          <li>Pe tablă sunt ascunse șase căsuțe surpriză: mai arunci o dată, stai o tură sau schimbi locul cu cineva.</li>
+          <li>La final ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</li>
+          <li>Dacă nu arunci 30 de secunde, jocul aruncă pentru tine.</li>
+        </ol>
+        <h3>Săgețile de pe tablă</h3>
+        <div id="legend"></div>
+        <p class="privacy">Nu ai nevoie de cont. Mutările trec printr-un server public gratuit, dar sunt criptate cu codul partidei: doar cine are codul vede jocul, numele și pozele. Efectele din animații folosesc Fluent Emoji de la Microsoft (licență MIT).</p>
+      </div>
+    </div>
 
-    <div class="card me">
-      <p class="note-banner" id="connNote" hidden></p>
-      <h2>Cine joacă?</h2>
-      <label class="field"><span>Porecla ta</span><input id="prefName" maxlength="14" autocomplete="nickname" placeholder="ex. Matei"></label>
-      <div class="field"><span id="pcLabel">Culoarea pionului</span><div id="prefPicker"></div></div>
-      <div class="field"><span id="paLabel">Accesoriu</span><div id="prefAcc"></div></div>
-      <div class="field"><span>Poza de pe pion (dacă vrei)</span>
-        <div class="picrow"><span class="pic-prev" id="prefPicPrev"></span>
-          <span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="me">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearPic" id="prefPicClear" hidden>Scoate poza</button></span>
+    <div class="rcol">
+      <div class="card me">
+        <p class="note-banner" id="connNote" hidden></p>
+        <h2>Cine joacă?</h2>
+        <label class="field"><span>Porecla ta</span><input id="prefName" maxlength="14" autocomplete="nickname" placeholder="ex. Matei"></label>
+        <div class="field"><span id="pcLabel">Culoarea pionului</span><div id="prefPicker"></div></div>
+        <div class="field"><span id="paLabel">Accesoriu</span><div id="prefAcc"></div></div>
+        <div class="field"><span>Poza de pe pion (dacă vrei)</span>
+          <div class="picrow"><span class="pic-prev" id="prefPicPrev"></span>
+            <span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="me">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearPic" id="prefPicClear" hidden>Scoate poza</button></span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary big" type="button" data-act="create" id="createBtn">Partidă nouă</button>
+          <form class="codeform" id="codeForm" autocomplete="off">
+            <label class="sr" for="codeInput">Codul partidei</label>
+            <input id="codeInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" spellcheck="false">
+            <button class="btn" type="submit">Intră</button>
+          </form>
+        </div>
+        <p class="hint">Unul face partida nouă și le trimite celorlalți linkul. Cine are doar codul îl scrie aici și apasă „Intră”.</p>
+        <div class="local-row">
+          <p>Sunteți toți la aceeași masă? Jucați pe rând pe un singur telefon.</p>
+          <button class="btn small" type="button" data-act="local">Joc pe un telefon</button>
+        </div>
+        <div class="local-row" id="installRow" hidden>
+          <p id="installText"></p>
+          <button class="btn small" type="button" id="installBtn" data-act="install">Instalează</button>
         </div>
       </div>
-      <div class="actions">
-        <button class="btn primary big" type="button" data-act="create" id="createBtn">Partidă nouă</button>
-        <form class="codeform" id="codeForm" autocomplete="off">
-          <label class="sr" for="codeInput">Codul partidei</label>
-          <input id="codeInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" spellcheck="false">
-          <button class="btn" type="submit">Intră</button>
-        </form>
+      <div class="card list">
+        <h2>Partidele tale</h2>
+        <div id="gameList" class="glist"></div>
       </div>
-      <p class="hint">Unul face partida nouă și le trimite celorlalți linkul. Cine are doar codul îl scrie aici și apasă „Intră”.</p>
-      <div class="local-row">
-        <p>Sunteți toți la aceeași masă? Jucați pe rând pe un singur telefon.</p>
-        <button class="btn small" type="button" data-act="local">Joc pe un telefon</button>
-      </div>
-      <div class="local-row" id="installRow" hidden>
-        <p id="installText"></p>
-        <button class="btn small" type="button" id="installBtn" data-act="install">Instalează</button>
-      </div>
-    </div>
-
-    <div class="card list">
-      <h2>Partidele tale</h2>
-      <div id="gameList" class="glist"></div>
-    </div>
-
-    <div class="card rules">
-      <h2>Cum se joacă</h2>
-      <ol class="howto">
-        <li>Toți pornesc de la START. La rândul tău dai cu zarul și muți pionul atâtea căsuțe.</li>
-        <li>Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori.</li>
-        <li>Dacă ajungi pe o căsuță unde stă deja cineva, zarul se anulează: te întorci unde erai și trece rândul.</li>
-        <li>Pe tablă sunt ascunse șase căsuțe surpriză: mai arunci o dată, stai o tură sau schimbi locul cu cineva.</li>
-        <li>La final ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</li>
-        <li>Dacă nu arunci 30 de secunde, jocul aruncă pentru tine.</li>
-      </ol>
-      <h3>Săgețile de pe tablă</h3>
-      <div id="legend"></div>
-      <p class="privacy">Nu ai nevoie de cont. Mutările trec printr-un server public gratuit, dar sunt criptate cu codul partidei: doar cine are codul vede jocul, numele și pozele. Efectele din animații folosesc Fluent Emoji de la Microsoft (licență MIT).</p>
     </div>
   </section>
 
   <section id="vGame" class="game" hidden>
-    <div class="gmain">
-      <div class="board-wrap">
+    <div class="stage">
+      <div class="board-wrap" id="boardWrap">
         <div class="board-scroll" id="boardScroll">
           <svg id="board" viewBox="0 0 1260 898" role="img" aria-label="Tabla de joc cu pionii jucătorilor">
             <rect class="strip" x="0" y="800" width="1260" height="98"/>
@@ -460,25 +527,34 @@ table.stats { width: 100%; border-collapse: collapse; font-size: 14px; font-vari
         <canvas id="confetti" hidden></canvas>
         <div class="die3d" id="die3d" hidden aria-hidden="true"><div class="cube" id="cube"></div></div>
       </div>
-      <div class="turnbar" id="turnbar">
-        <div class="die" id="die" aria-hidden="true"></div>
-        <div class="turn-text"><p class="turn-main" id="turnMain"></p><p class="turn-sub" id="turnSub" aria-live="polite"></p><p class="turn-cd" id="turnCd"></p></div>
-        <div class="turn-actions" id="turnActions" hidden></div>
-      </div>
-      <div class="react-bar" id="reactBar" hidden>
-        <div class="react-row"><button class="react-btn" type="button" data-react="0" aria-label="Râs" title="Râs"><img src="img/r-laugh.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="1" aria-label="Foc" title="Foc"><img src="img/r-fire.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="2" aria-label="Plâns" title="Plâns"><img src="img/r-cry.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="3" aria-label="Aplauze" title="Aplauze"><img src="img/r-clap.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="4" aria-label="Șoc" title="Șoc"><img src="img/r-scream.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="5" aria-label="Inimă" title="Inimă"><img src="img/r-heart.png" alt="" width="30" height="30"></button><button class="btn small phr-btn" type="button" data-act="phrases">Fraze</button></div>
-        <div class="phrase-row" id="phraseRow" hidden><button class="phrase" type="button" data-phrase="0">Haide odată!</button><button class="phrase" type="button" data-phrase="1">Noroc!</button><button class="phrase" type="button" data-phrase="2">Nuuu!</button><button class="phrase" type="button" data-phrase="3">Bravo!</button><button class="phrase" type="button" data-phrase="4">Ce ghinion!</button><button class="phrase" type="button" data-phrase="5">Revanșa!</button><button class="phrase" type="button" data-phrase="6">Te prind!</button><button class="phrase" type="button" data-phrase="7">Pa-pa, 120!</button></div>
+    </div>
+
+    <div class="side">
+      <div class="dock" id="dock">
+        <div class="turnbar" id="turnbar">
+          <div class="die" id="die" aria-hidden="true"></div>
+          <div class="turn-text"><p class="turn-main" id="turnMain"></p><p class="turn-sub" id="turnSub" aria-live="polite"></p><p class="turn-cd" id="turnCd"></p></div>
+          <div class="turn-actions" id="turnActions" hidden></div>
+        </div>
+        <div class="react-bar" id="reactBar" hidden>
+          <div class="react-row"><button class="react-btn" type="button" data-react="0" aria-label="Râs" title="Râs"><img src="img/r-laugh.png" alt="" width="28" height="28"></button><button class="react-btn" type="button" data-react="1" aria-label="Foc" title="Foc"><img src="img/r-fire.png" alt="" width="28" height="28"></button><button class="react-btn" type="button" data-react="2" aria-label="Plâns" title="Plâns"><img src="img/r-cry.png" alt="" width="28" height="28"></button><button class="react-btn" type="button" data-react="3" aria-label="Aplauze" title="Aplauze"><img src="img/r-clap.png" alt="" width="28" height="28"></button><button class="react-btn" type="button" data-react="4" aria-label="Șoc" title="Șoc"><img src="img/r-scream.png" alt="" width="28" height="28"></button><button class="react-btn" type="button" data-react="5" aria-label="Inimă" title="Inimă"><img src="img/r-heart.png" alt="" width="28" height="28"></button><button class="btn small phr-btn" type="button" data-act="phrases" aria-expanded="false">Fraze</button></div>
+          <div class="phrase-row" id="phraseRow" hidden><button class="phrase" type="button" data-phrase="0">Haide odată!</button><button class="phrase" type="button" data-phrase="1">Noroc!</button><button class="phrase" type="button" data-phrase="2">Nuuu!</button><button class="phrase" type="button" data-phrase="3">Bravo!</button><button class="phrase" type="button" data-phrase="4">Ce ghinion!</button><button class="phrase" type="button" data-phrase="5">Revanșa!</button><button class="phrase" type="button" data-phrase="6">Te prind!</button><button class="phrase" type="button" data-phrase="7">Pa-pa, 120!</button></div>
+        </div>
       </div>
       <div class="card join" id="joinCard" hidden></div>
+      <div class="panel">
+        <div class="tabs" role="tablist" aria-label="Detalii partidă">
+          <button class="tab" type="button" role="tab" data-tab="players" id="tab-players" aria-selected="true">Jucători</button>
+          <button class="tab" type="button" role="tab" data-tab="stats" id="tab-stats" aria-selected="false" hidden>Statistici</button>
+          <button class="tab" type="button" role="tab" data-tab="log" id="tab-log" aria-selected="false">Istoric</button>
+          <button class="tab" type="button" role="tab" data-tab="rules" id="tab-rules" aria-selected="false">Reguli</button>
+        </div>
+        <div class="pane" role="tabpanel" data-pane="players"><div id="playersCard"></div></div>
+        <div class="pane" role="tabpanel" data-pane="stats" hidden><div id="statsCard"></div></div>
+        <div class="pane" role="tabpanel" data-pane="log" hidden><div id="logCard"></div></div>
+        <div class="pane" role="tabpanel" data-pane="rules" hidden><div id="rulesCard"></div><div class="quiet" id="dangerCard" hidden></div></div>
+      </div>
     </div>
-    <aside class="side">
-      <div class="card" id="playersCard"></div>
-      <div class="card" id="statsCard" hidden></div>
-      <div class="card" id="rankCard" hidden></div>
-      <div class="card" id="logCard"></div>
-      <div class="card" id="rulesCard"></div>
-      <div class="quiet" id="dangerCard" hidden></div>
-    </aside>
   </section>
 </main>
 <div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
@@ -1169,8 +1245,9 @@ function floatLabel(txt, up, p, kind) {
 }
 function follow(pt) {
   if (!S.zoom || !pt) return;
-  const sc = $('#boardScroll'), w = $('#board').getBoundingClientRect().width;
-  sc.scrollLeft = pt.x / 1260 * w - sc.clientWidth / 2;
+  const sc = $('#boardScroll'), r = $('#board').getBoundingClientRect();
+  sc.scrollLeft = pt.x / 1260 * r.width - sc.clientWidth / 2;
+  sc.scrollTop = pt.y / 898 * r.height - sc.clientHeight / 2;
 }
 
 /* ---------- one animation per arrow ---------- */
@@ -1497,7 +1574,7 @@ function afterSettle() {
   }
   if (!g.local && myTurn(g)) {
     const key = g.code + ':' + g.rev;
-    if (S.buzzed !== key) { S.buzzed = key; Sound.fx('turn'); try { navigator.vibrate && navigator.vibrate(35); } catch {} }
+    if (S.buzzed !== key) { S.buzzed = key; Sound.fx('turn'); const ua = navigator.userActivation; try { if (navigator.vibrate && (!ua || ua.hasBeenActive)) navigator.vibrate(35); } catch {} }
   }
   if (S.zoom && g.status === 'playing') { const c = curP(g); if (c) follow(S.pp[c.id]); }
 }
@@ -1937,7 +2014,7 @@ function renderTurn() {
   const act = $('#turnActions');
   if (S.lastAct !== a) { act.innerHTML = a; S.lastAct = a; }
   act.hidden = !a;
-  $('#turnbar').classList.toggle('mine', mine && !!g && !g.local && !S.animating);
+  $('#dock').classList.toggle('mine', mine && !!g && !g.local && !S.animating);
   renderCountdown();
 }
 function renderJoin() {
@@ -1971,13 +2048,13 @@ function renderPlayers() {
   const rows = g.players.map(p => {
     const pos = S.shown[p.id] ?? p.pos, on = !g.local && isOnline(p.id);
     return `<li class="pl${cur && cur.id === p.id ? ' is-turn' : ''}"><span class="chipbg">${avatar(p.color, picOf(p, g), 34, p.acc)}${g.local ? '' : `<i class="dot${on ? ' on' : ''}" title="${on ? 'e aici acum' : 'nu e aici acum'}"></i>`}</span>`
-      + `<span class="pl-mid"><span class="pl-name">${esc(p.name)}${!g.local && p.id === S.pid ? ' <em>(tu)</em>' : ''}${g.winner === p.id ? '<span class="chip st-win">câștigător</span>' : ''}${p.skip && g.status === 'playing' ? '<span class="chip st-skip">stă o tură</span>' : ''}</span>`
+      + `<span class="pl-mid"><span class="pl-name">${esc(p.name)}${!g.local && p.id === S.pid ? ' <em>(tu)</em>' : ''}${g.wins[p.id] ? `<span class="wins" title="Victorii cu acest cod">${g.wins[p.id]} ${g.wins[p.id] === 1 ? 'victorie' : 'victorii'}</span>` : ''}${g.winner === p.id ? '<span class="chip st-win">câștigător</span>' : ''}${p.skip && g.status === 'playing' ? '<span class="chip st-skip">stă o tură</span>' : ''}</span>`
       + `<span class="bar"><span style="width:${(pos / LAST * 100).toFixed(1)}%;background:${COLORS[p.color].f}"></span></span></span>`
       + `<span class="pl-pos">${pos > 0 ? `<b>${pos}</b>` : 'START'}</span></li>`;
   }).join('');
   const mine = !g.local && meIn(g);
-  box.innerHTML = `<h3>Jucători <span class="count">${g.players.length}/${MAXP}</span></h3>`
-    + (rows ? `<ol class="players">${rows}</ol>` : '<p class="empty">Încă nu a intrat nimeni.</p>')
+  $('#tab-players').innerHTML = `Jucători <span class="count">${g.players.length}/${MAXP}</span>`;
+  box.innerHTML = (rows ? `<ol class="players">${rows}</ol>` : '<p class="empty">Încă nu a intrat nimeni.</p>')
     + (mine ? `<div class="mypic"><button class="btn ghost small" type="button" data-act="pickPic" data-for="me">${S.prefs.pic ? 'Schimbă poza de pe pion' : 'Pune o poză pe pion'}</button></div>` : '');
 }
 function renderLog() {
@@ -1986,7 +2063,7 @@ function renderLog() {
   const hidden = new Set(S.queue.map(q => q.rid));
   if (S.animRid) hidden.add(S.animRid);
   const items = g.log.filter(e => !(e.k === 'move' && hidden.has(e.rid))).slice(-30).reverse();
-  box.innerHTML = '<h3>Ce s-a întâmplat</h3>' + (items.length
+  box.innerHTML = (items.length
     ? `<ol class="log">${items.map(e => `<li>${e.c != null ? miniPawn(e.c, 18) : '<span></span>'}<span>${logHTML(e)}</span></li>`).join('')}</ol>`
     : '<p class="empty">Nimic încă.</p>');
 }
@@ -1995,8 +2072,7 @@ function renderRules() {
   if (!g) { box.innerHTML = ''; return; }
   const can = g.status === 'lobby' && meIn(g), dis = can ? '' : ' disabled';
   const tg = (key, title, on, off) => `<label class="toggle"><input type="checkbox" data-rule="${key}"${g.rules[key] ? ' checked' : ''}${dis}><span><b>${title}</b><small>${g.rules[key] ? on : off}</small></span></label>`;
-  box.innerHTML = '<h3>Reguli</h3>'
-    + '<p class="end-rule"><b>La final</b> ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</p>'
+  box.innerHTML = '<p class="end-rule"><b>La final</b> ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</p>'
     + tg('block', 'Căsuța ocupată anulează zarul', 'Dacă ajungi pe o căsuță unde stă deja cineva, te întorci unde erai și trece rândul.', 'Oprit: pot sta mai mulți pe aceeași căsuță.')
     + tg('surprise', 'Căsuțe surpriză', 'Șase căsuțe ascunse: două dau „mai arunci o dată”, două „stai o tură”, două „schimbi locul cu cineva”.', 'Oprit: fără surprize.')
     + tg('six', 'La 6 mai arunci o dată', 'Pornit.', 'Oprit: fiecare aruncă o singură dată pe tură.')
@@ -2022,7 +2098,11 @@ function renderWin() {
 const EMPTY_ST = Object.fromEntries(STAT_KEYS.map(k => [k, 0]));
 function renderStats() {
   const g = S.game, box = $('#statsCard');
-  if (!g || g.status !== 'done' || S.animating) { box.hidden = true; return; }
+  const tab = $('#tab-stats');
+  if (!g || g.status !== 'done' || S.animating) { tab.hidden = true; if (S.tab === 'stats') selectTab('players'); box.innerHTML = ''; return; }
+  tab.hidden = false;
+  const key = g.code + ':' + (g.last ? g.last.rid : '');
+  if (S.statsFor !== key) { S.statsFor = key; selectTab('stats'); }
   const rows = g.players.map(p => ({ p, s: g.stats[p.id] || EMPTY_ST }));
   const best = key => rows.reduce((a, r) => (r.s[key] > (a ? a.s[key] : 0) ? r : a), null);
   const nm = r => `<b>${esc(r.p.name)}</b>`;
@@ -2033,22 +2113,10 @@ function renderStats() {
   if (up) lines.push(`<li>Cea mai mare urcare: ${nm(up)}, +${up.s.mu}</li>`);
   if (down) lines.push(`<li>Cea mai mare cădere: ${nm(down)}, −${down.s.md}</li>`);
   if (blocked) lines.push(`<li>Cel mai des blocat pe căsuță ocupată: ${nm(blocked)}, de ${blocked.s.x} ori</li>`);
-  box.hidden = false;
-  box.innerHTML = '<h3>Statistici</h3>' + (lines.length ? `<ul class="highlights">${lines.join('')}</ul>` : '')
+  box.innerHTML = (lines.length ? `<ul class="highlights">${lines.join('')}</ul>` : '')
     + `<div class="table-wrap"><table class="stats"><thead><tr><th>Jucător</th><th title="Aruncări">Aruncări</th><th title="Urcări pe săgeți">Sus</th><th title="Coborâri pe săgeți">Jos</th><th title="De câte ori a dat 6">De 6</th><th title="Zaruri anulate">Anulate</th></tr></thead><tbody>`
     + rows.map(r => `<tr><td>${miniPawn(r.p.color, 18, r.p.acc)}<span>${esc(r.p.name)}</span></td><td>${r.s.r}</td><td>${r.s.u}</td><td>${r.s.d}</td><td>${r.s.s6}</td><td>${r.s.x}</td></tr>`).join('')
     + '</tbody></table></div>';
-}
-function renderRank() {
-  const g = S.game, box = $('#rankCard');
-  const total = g ? g.players.reduce((n, p) => n + (g.wins[p.id] || 0), 0) : 0;
-  if (!g || !total || S.animating) { box.hidden = true; return; }
-  const rows = [...g.players].sort((a, b) => (g.wins[b.id] || 0) - (g.wins[a.id] || 0));
-  const top = g.wins[rows[0].id] || 0;
-  box.hidden = false;
-  box.innerHTML = `<h3>Clasament <span class="count">${total} ${total === 1 ? 'partidă' : 'partide'}</span></h3><ol class="rank">`
-    + rows.map(p => { const w = g.wins[p.id] || 0; return `<li${w && w === top ? ' class="lead"' : ''}><span class="chipbg">${avatar(p.color, picOf(p, g), 30, p.acc)}</span><span class="rk-name">${esc(p.name)}</span><span class="rk-wins"><b>${w}</b> ${w === 1 ? 'victorie' : 'victorii'}</span></li>`; }).join('')
-    + '</ol>';
 }
 // Surprise squares show their icon once someone has landed on them.
 function renderMarks() {
@@ -2066,9 +2134,14 @@ function renderReactBar() {
   $('#reactBar').hidden = !show;
   if (!show) $('#phraseRow').hidden = true;
 }
+function selectTab(name) {
+  S.tab = name;
+  for (const t of document.querySelectorAll('.tab')) t.setAttribute('aria-selected', String(t.dataset.tab === name));
+  for (const p of document.querySelectorAll('.pane')) p.hidden = p.dataset.pane !== name;
+}
 function renderGame() {
   if (S.view !== 'game') return;
-  renderHeader(); renderTurn(); renderJoin(); renderPlayers(); renderStats(); renderRank(); renderLog(); renderRules(); renderDanger(); renderWin(); renderMarks(); renderReactBar();
+  renderHeader(); renderTurn(); renderJoin(); renderPlayers(); renderStats(); renderLog(); renderRules(); renderDanger(); renderWin(); renderMarks(); renderReactBar();
 }
 function confetti() {
   if (REDUCED) return;
@@ -2103,7 +2176,8 @@ function setHash(code) {
 function enterGame(code) {
   S.gen++;
   leaveRoom();
-  Object.assign(S, { view: 'game', code, game: null, missing: false, firstSnap: true, queue: [], shown: {}, pp: {}, animating: false, animText: '', animWho: null, animRid: null, pendingRoll: false, joinColor: null, joinAcc: null, localPic: '', lastAct: null, confirm: null, animL: null });
+  Object.assign(S, { view: 'game', code, game: null, missing: false, firstSnap: true, queue: [], shown: {}, pp: {}, animating: false, animText: '', animWho: null, animRid: null, pendingRoll: false, joinColor: null, joinAcc: null, localPic: '', lastAct: null, confirm: null, animL: null, statsFor: null });
+  selectTab('players');
   $('#pawns').replaceChildren(); $('#fx').replaceChildren(); $('#fxTop').replaceChildren(); $('#marks').replaceChildren(); $('#phraseRow').hidden = true;
   spinDie(false); renderDie(S.lastDie);
   $('#joinCard').dataset.key = '';
@@ -2152,8 +2226,9 @@ document.addEventListener('click', e => {
   const panel = $('#soundPanel');
   if (!panel.hidden && !e.target.closest('#soundPanel, #soundBtn')) toggleSoundPanel(false);
   if (!$('#shareModal').hidden && e.target.id === 'shareModal') { closeShare(); return; }
-  const t = e.target.closest('[data-act],[data-open],[data-pc],[data-jc],[data-pa],[data-ja],[data-react],[data-phrase]');
+  const t = e.target.closest('[data-act],[data-open],[data-pc],[data-jc],[data-pa],[data-ja],[data-react],[data-phrase],[data-tab]');
   if (!t || t.disabled) return;
+  if (t.dataset.tab) { selectTab(t.dataset.tab); return; }
   if (t.dataset.open) { openGame(t.dataset.open); return; }
   if (t.dataset.pc != null) { S.prefs.color = int(t.dataset.pc, 0, 9); savePrefs(); renderPrefPicker(); return; }
   if (t.dataset.jc != null) { S.joinColor = int(t.dataset.jc, 0, 9); renderJoin(); return; }
@@ -2163,7 +2238,7 @@ document.addEventListener('click', e => {
   if (t.dataset.phrase != null) { sendReaction('p', int(t.dataset.phrase, 0, PHRASES.length - 1)); return; }
   const acts = {
     create: createGame, back: goLobby, share: openShare, closeShare, copyLink, shareLink, roll: doRoll, start: startGame, join: joinGame,
-    phrases: () => { $('#phraseRow').hidden = !$('#phraseRow').hidden; }, install: installApp,
+    phrases: () => { const r = $('#phraseRow'); r.hidden = !r.hidden; t.setAttribute('aria-expanded', String(!r.hidden)); }, install: installApp,
     rematch, zoom: () => toggleZoom(), local: openLocal, soundPanel: () => toggleSoundPanel(),
     leave: () => confirmThen('leave', leaveGame), quitLocal: () => confirmThen('quitLocal', quitLocal),
     pickPic: () => { S.picFor = t.dataset.for || 'me'; $('#picInput').click(); },
