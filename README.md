@@ -11,10 +11,16 @@ Jocul de pe tabla de circ cu 120 de căsuțe, online, pentru până la 10 jucăt
 3. Cine deschide linkul apasă **Intră în joc**. Nu e nevoie de cont.
 4. Când sunteți toți, apăsați **Începe jocul**. Ordinea se trage la sorți.
 
-Dai cu zarul și muți pionul. Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori. Câștigă primul care ajunge exact pe 120.
+Dai cu zarul și muți pionul. Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori, fiecare săgeată cu animația ei. La final ai nevoie de exact cât îți lipsește până la 120: dacă dai mai puțin, înaintezi; dacă dai mai mult, rămâi pe loc.
 
 Dacă stați toți la aceeași masă, **Joc pe un telefon** vă lasă să jucați pe rând pe un singur telefon.
 
 ## Cum funcționează
 
-Pagina e un singur fișier HTML. Mutările trec prin două servere MQTT publice și gratuite (EMQX și HiveMQ), criptate AES-GCM cu o cheie derivată din codul partidei. Doar cine are codul poate citi partida, numele și pozele.
+Tabla e desenată în SVG direct în pagină. Sunetele și melodia de circ sunt generate în browser; din butonul cu difuzor poți alege și o melodie de pe telefonul tău, care se aude doar la tine.
+
+Mutările trec prin două servere MQTT publice și gratuite (EMQX și HiveMQ), criptate AES-GCM cu o cheie derivată din codul partidei. Doar cine are codul poate citi partida, numele și pozele.
+
+## Imagini
+
+Animalele și obiectele de pe tablă sunt [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) de la Microsoft, folosite sub licența MIT (vezi `img/LICENSE-fluentui-emoji.txt`).
