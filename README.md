@@ -17,10 +17,10 @@ Dacă stați toți la aceeași masă, **Joc pe un telefon** vă lasă să jucaț
 
 ## Cum funcționează
 
-Tabla e desenată în SVG direct în pagină. Sunetele și melodia de circ sunt generate în browser; din butonul cu difuzor poți alege și o melodie de pe telefonul tău, care se aude doar la tine.
+Tabla e poza tablei originale, îndreptată și îmbunătățită (`board.jpg`). Muzica jocului e `audio/circus.mp3`; efectele sonore sunt generate în browser. Din butonul cu difuzor poți opri sunetul sau poți pune altă melodie de pe telefonul tău, care se aude doar la tine.
 
 Mutările trec prin două servere MQTT publice și gratuite (EMQX și HiveMQ), criptate AES-GCM cu o cheie derivată din codul partidei. Doar cine are codul poate citi partida, numele și pozele.
 
 ## Imagini
 
-Animalele și obiectele de pe tablă sunt [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) de la Microsoft, folosite sub licența MIT (vezi `img/LICENSE-fluentui-emoji.txt`).
+Efectele din animații (racheta, baloanele, umbrela, papagalul, trofeul și altele) sunt [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) de la Microsoft, folosite sub licența MIT (vezi `img/LICENSE-fluentui-emoji.txt`).

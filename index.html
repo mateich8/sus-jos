@@ -278,6 +278,7 @@ h1, h2, h3 { text-wrap: balance; }
 .sound-panel p { margin: 6px 0 0; }
 .end-rule { margin: 4px 0 8px; font-size: 14.5px; color: var(--muted); }
 .end-rule b { color: var(--ink); }
+
 </style>
 </head>
 <body>
@@ -300,12 +301,12 @@ h1, h2, h3 { text-wrap: balance; }
 <div class="sound-panel" id="soundPanel" hidden>
   <h3>Sunet și muzică</h3>
   <label class="toggle"><input type="checkbox" id="sfxOn"><span><b>Efecte sonore</b><small>Zarul, pașii și săgețile.</small></span></label>
-  <label class="toggle"><input type="checkbox" id="musicOn"><span><b>Muzică</b><small id="songLabel">Melodia de circ a jocului</small></span></label>
+  <label class="toggle"><input type="checkbox" id="musicOn"><span><b>Muzică</b><small id="songLabel">Melodia jocului: Circus Board Game</small></span></label>
   <div class="sp-row">
-    <button class="btn small" type="button" data-act="pickSong">Alege o melodie de pe telefon</button>
+    <button class="btn small" type="button" data-act="pickSong">Pune altă melodie, doar la tine</button>
     <button class="btn ghost small" type="button" data-act="clearSong" id="clearSong" hidden>Înapoi la melodia jocului</button>
   </div>
-  <p class="muted small">Melodia aleasă de tine se aude doar pe telefonul tău.</p>
+  <p class="muted small">Melodia pe care o alegi tu se aude doar pe telefonul tău. Ceilalți aud în continuare melodia jocului.</p>
 </div>
 
 <main class="wrap">
@@ -353,7 +354,7 @@ h1, h2, h3 { text-wrap: balance; }
       </ol>
       <h3>Săgețile de pe tablă</h3>
       <div id="legend"></div>
-      <p class="privacy">Nu ai nevoie de cont. Mutările trec printr-un server public gratuit, dar sunt criptate cu codul partidei: doar cine are codul vede jocul, numele și pozele. Animalele sunt Fluent Emoji de la Microsoft (licență MIT).</p>
+      <p class="privacy">Nu ai nevoie de cont. Mutările trec printr-un server public gratuit, dar sunt criptate cu codul partidei: doar cine are codul vede jocul, numele și pozele. Efectele din animații folosesc Fluent Emoji de la Microsoft (licență MIT).</p>
     </div>
   </section>
 
@@ -544,101 +545,13 @@ function freeColor(g, want) {
   return 0;
 }
 
-/* ---------- the drawn board ---------- */
-// Pictures sit where they are on the printed board; ids let the arrow animations move them.
-const DECOR = [
-  { id: 'monkey', img: 'monkey', x: 150, y: 150, w: 104 },
-  { id: 'sparkles', img: 'sparkles', x: 560, y: 104, w: 64 },
-  { id: 'star', img: 'star', x: 470, y: 80, w: 40 },
-  { id: 'rocket', img: 'rocket', x: 424, y: 206, w: 116, rot: 75 },
-  { id: 'horse', img: 'horse', x: 690, y: 132, w: 176, rot: -8 },
-  { id: 'teddy', img: 'teddy', x: 922, y: 166, w: 126 },
-  { id: 'ball2', img: 'ball', x: 986, y: 196, w: 56 },
-  { id: 'horse2', img: 'horse', x: 1082, y: 340, w: 176, flip: true },
-  { id: 'acrobat', img: 'acrobat', x: 1088, y: 230, w: 96 },
-  { id: 'seal', img: 'seal', x: 724, y: 394, w: 158 },
-  { id: 'nose', img: 'ball', x: 664, y: 318, w: 38 },
-  { id: 'elephant', img: 'elephant', x: 290, y: 342, w: 166 },
-  { id: 'clownfall', img: 'clown', x: 552, y: 330, w: 98, rot: -14 },
-  { id: 'parrot', img: 'parrot', x: 106, y: 478, w: 78 },
-  { id: 'juggler', img: 'juggler', x: 556, y: 604, w: 148 },
-  { id: 'chipmunk', img: 'chipmunk', x: 770, y: 588, w: 84, rot: -18 },
-  { id: 'umbrella', img: 'umbrella', x: 896, y: 412, w: 114, rot: -12 },
-  { id: 'cat', img: 'cat', x: 948, y: 530, w: 78, rot: 18 },
-  { id: 'clown', img: 'clown', x: 1096, y: 552, w: 110 },
-  { id: 'popper', img: 'popper', x: 1162, y: 488, w: 46 },
-  { id: 'chick', img: 'chick', x: 212, y: 614, w: 88 },
-  { id: 'firecracker', img: 'firecracker', x: 262, y: 566, w: 42, rot: 10 },
-  { id: 'poodle', img: 'poodle', x: 388, y: 718, w: 116 },
-  { id: 'rabbit', img: 'rabbit', x: 702, y: 720, w: 106 },
-  { id: 'sparkles2', img: 'sparkles', x: 128, y: 772, w: 42 },
-];
-const DECOR_AT = Object.fromEntries(DECOR.map(d => [d.id, d]));
+/* ---------- the board: the photo of the real board, straightened and cleaned up ---------- */
+// Spots on the photo that animations start from (the parrot's cage).
+const PHOTO_SPOTS = { 47: { x: 106, y: 478 } };
+const spotXY = n => PHOTO_SPOTS[n] || cellXY(n);
 const f1 = v => (+v).toFixed(1);
 function imgTag(name, w, extra = '') { return `<image href="img/${name}.png" x="${f1(-w / 2)}" y="${f1(-w / 2)}" width="${w}" height="${w}"${extra}/>`; }
-function decorTag(p, d) {
-  const tf = [d.rot ? `rotate(${d.rot})` : '', d.flip ? 'scale(-1 1)' : ''].join(' ').trim();
-  return `<g transform="translate(${d.x} ${d.y})"><g class="dec" id="${p}d-${d.id}">${imgTag(d.img, d.w, tf ? ` transform="${tf}"` : '')}</g></g>`;
-}
-function ladderTag(x1, y1, x2, y2, col, dark) {
-  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), px = -dy / L * 15, py = dx / L * 15, rungs = Math.floor(L / 30);
-  const seg = (ax, ay, bx, by, w, c) => `<line x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(bx)}" y2="${f1(by)}" stroke="${c}" stroke-width="${w}"/>`;
-  let s = '<g stroke-linecap="round">';
-  for (let i = 1; i < rungs; i++) { const cx = x1 + dx * i / rungs, cy = y1 + dy * i / rungs; s += seg(cx - px, cy - py, cx + px, cy + py, 8, dark) + seg(cx - px, cy - py, cx + px, cy + py, 4.5, col); }
-  for (const k of [-1, 1]) s += seg(x1 + px * k, y1 + py * k, x2 + px * k, y2 + py * k, 10, dark) + seg(x1 + px * k, y1 + py * k, x2 + px * k, y2 + py * k, 6, col);
-  return s + '</g>';
-}
-function arrowPathD(from, to) {
-  const A = cellXY(from), B = cellXY(to), D = Math.hypot(B.x - A.x, B.y - A.y);
-  const ux = (B.x - A.x) / D, uy = (B.y - A.y) / D, px = -uy, py = ux, off = Math.min(18, D * 0.1);
-  const ax = A.x + ux * off, ay = A.y + uy * off, L = D - 2 * off;
-  const w = 6, hw = 17, hl = Math.min(34, L * 0.45), tail = Math.min(16, L * 0.2), notch = tail * 0.6;
-  const P = (t, n) => `${f1(ax + ux * t + px * n)} ${f1(ay + uy * t + py * n)}`;
-  return 'M' + [P(0, w + 7), P(tail, w), P(L - hl, w), P(L - hl, hw), P(L, 0), P(L - hl, -hw), P(L - hl, -w), P(tail, -w), P(0, -w - 7), P(notch, 0)].join('L') + 'Z';
-}
-function boardSVG(p) {
-  const yellow = new Set(ARROWS.flatMap(([a, b]) => [a, b]));
-  let s = `<defs>
-    <pattern id="${p}trim" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#D3F4B8"/><path d="M0 13c4.3-7 8.7-7 13 0s8.7 7 13 0" fill="none" stroke="#45B85F" stroke-width="2.2"/><circle cx="6.5" cy="5" r="2.2" fill="#45B85F"/><circle cx="19.5" cy="21" r="2.2" fill="#45B85F"/></pattern>
-    <linearGradient id="${p}felt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#13A452"/><stop offset="1" stop-color="#0B8641"/></linearGradient>
-    <radialGradient id="${p}ballg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFF1C9"/><stop offset=".55" stop-color="#F8AE4E"/><stop offset="1" stop-color="#D2691F"/></radialGradient>
-    <filter id="${p}sh" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#000000" flood-opacity=".3"/></filter>`;
-  for (let r = 0; r < 10; r++) s += `<clipPath id="${p}row${r}"><rect x="${GX0}" y="${f1(GY1 - (r + 1) * RH)}" width="${GX1 - GX0}" height="${f1(RH)}" rx="${f1(RH / 2)}"/></clipPath>`;
-  s += '</defs>';
-  s += `<rect width="1260" height="818" rx="12" fill="url(#${p}trim)"/><rect x="11" y="11" width="1238" height="796" rx="7" fill="url(#${p}felt)"/>`;
-  // rows of cells
-  for (let r = 0; r < 10; r++) {
-    const y = GY1 - (r + 1) * RH;
-    s += `<g clip-path="url(#${p}row${r})"><rect x="${GX0}" y="${f1(y)}" width="${GX1 - GX0}" height="${f1(RH)}" fill="#FFF7E6"/>`;
-    for (let c = 0; c < 12; c++) {
-      const n = r * 12 + (r % 2 === 0 ? c : 11 - c) + 1;
-      if (yellow.has(n)) s += `<rect x="${f1(GX0 + c * CW)}" y="${f1(y)}" width="${f1(CW)}" height="${f1(RH)}" fill="#FFE52E"/>`;
-    }
-    for (let c = 1; c < 12; c++) s += `<line x1="${f1(GX0 + c * CW)}" y1="${f1(y)}" x2="${f1(GX0 + c * CW)}" y2="${f1(y + RH)}" stroke="#3A332B" stroke-width="1.6"/>`;
-    s += `</g><rect x="${GX0}" y="${f1(y)}" width="${GX1 - GX0}" height="${f1(RH)}" rx="${f1(RH / 2)}" fill="none" stroke="#2D2823" stroke-width="2.4"/>`;
-  }
-  // props drawn under the animals
-  s += ladderTag(92, 262, 196, 50, '#2FB457', '#145C2B');
-  s += ladderTag(812, 714, 700, 468, '#F0553F', '#7D1B12');
-  s += `<g stroke="#FFF3B8" stroke-width="2.6" stroke-linecap="round" opacity=".95"><line x1="372" y1="168" x2="318" y2="128"/><line x1="368" y1="160" x2="330" y2="104"/><line x1="380" y1="158" x2="360" y2="96"/><line x1="362" y1="176" x2="306" y2="158"/></g>`;
-  s += `<g id="${p}d-eball" class="dec"><circle cx="282" cy="454" r="54" fill="url(#${p}ballg)" stroke="#9A4E12" stroke-width="2"/><path d="M229 444Q282 474 335 444L337 460Q282 492 227 460Z" fill="#2B7BD8"/><path d="M258 410q24-12 46 0" stroke="#FFFFFF" stroke-width="5" fill="none" opacity=".55" stroke-linecap="round"/></g>`;
-  s += `<g id="${p}d-jballs" class="dec">${[['#E8463A', 742, 244], ['#2B7BD8', 756, 210], ['#22A653', 784, 192], ['#FFC21A', 812, 206], ['#8E44D1', 826, 238]].map(([c, x, y]) => `<circle cx="${x}" cy="${y}" r="10" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><circle cx="${x - 3}" cy="${y - 3.5}" r="3" fill="#FFFFFF" opacity=".7"/>`).join('')}</g>`;
-  s += `<g id="${p}d-balloons" class="dec"><g stroke="#6B6B6B" stroke-width="1.6" fill="none"><path d="M520 470q-6-20 -8-46"/><path d="M520 470q8-24 22-52"/><path d="M520 470q2-30 2-74"/></g>`
-    + `<g transform="translate(510 418)">${imgTag('balloon', 50)}</g><g transform="translate(546 410)">${imgTag('balloon', 50, ' style="filter:hue-rotate(150deg)"')}</g><g transform="translate(526 384)">${imgTag('balloon', 50, ' style="filter:hue-rotate(250deg)"')}</g></g>`;
-  // animals
-  for (const d of DECOR) s += decorTag(p, d);
-  // parrot cage over the parrot
-  s += `<g fill="none" stroke="#B8891E" stroke-width="3"><path d="M70 524V460Q106 410 142 460V524"/>${[82, 94, 106, 118, 130].map(x => `<line x1="${x}" y1="${x === 106 ? 438 : x === 94 || x === 118 ? 442 : 452}" x2="${x}" y2="524"/>`).join('')}<line x1="64" y1="525" x2="148" y2="525" stroke-width="5"/><line x1="72" y1="492" x2="140" y2="492" stroke-width="2.5"/><circle cx="106" cy="430" r="5"/></g>`;
-  // arrows
-  for (const [a, b, c] of ARROWS) s += `<path id="${p}a-${a}" d="${arrowPathD(a, b)}" fill="${c}" stroke="rgba(0,0,0,.45)" stroke-width="1.6" stroke-linejoin="round" filter="url(#${p}sh)"/>`;
-  // numbers on top, with a halo in the cell colour so pictures and arrows never hide them
-  for (let n = 1; n <= LAST; n++) {
-    const { x, y } = cellXY(n), yl = yellow.has(n), cls = 'bn' + (n > 99 ? ' small3' : '');
-    s += `<text class="${cls} bn-halo" x="${f1(x)}" y="${f1(y + 11)}" text-anchor="middle" fill="${yl ? '#FFE52E' : '#FFF7E6'}" stroke="${yl ? '#FFE52E' : '#FFF7E6'}" stroke-width="8">${n}</text>`;
-    s += `<text class="${cls}" x="${f1(x)}" y="${f1(y + 11)}" text-anchor="middle" fill="${yl ? ARROW_COLOR[n] : '#2A2622'}"${yl ? ' stroke="#2B1A00" stroke-width="1.1"' : ''}>${n}</text>`;
-  }
-  return s;
-}
+const boardSVG = () => '<image href="board.jpg" x="0" y="0" width="1260" height="818" preserveAspectRatio="none"/>';
 
 /* ---------- encryption: the game code is the only key ---------- */
 const te = new TextEncoder(), td = new TextDecoder();
@@ -798,21 +711,11 @@ function writeError(e) {
   else toast('Ceva n-a mers. Mai încearcă o dată.');
 }
 
-/* ---------- sound: effects and music, all made in the browser ---------- */
-const MIDI = m => 440 * Math.pow(2, (m - 69) / 12);
-// An original little circus waltz (3/4): [melody notes as [midi, beats]] and one chord per bar.
-const WALTZ = {
-  bpm: 168,
-  melody: [[67, 1], [72, 1], [76, 1], [79, 2], [76, 1], [77, 1], [76, 1], [74, 1], [72, 2], [67, 1],
-    [69, 1], [72, 1], [77, 1], [81, 2], [77, 1], [76, 1], [74, 1], [73, 1], [74, 3],
-    [67, 1], [71, 1], [74, 1], [77, 2], [74, 1], [76, 1], [77, 1], [79, 1], [76, 2], [72, 1],
-    [69, 1], [72, 1], [76, 1], [74, 1], [77, 1], [71, 1], [72, 1], [76, 1], [74, 1], [72, 3]],
-  chords: [[48, [60, 64, 67]], [43, [60, 64, 67]], [43, [59, 62, 65]], [48, [60, 64, 67]], [41, [60, 65, 69]], [48, [60, 65, 69]], [45, [61, 64, 67]], [43, [59, 62, 67]],
-    [43, [59, 62, 65]], [50, [59, 62, 65]], [48, [60, 64, 67]], [43, [60, 64, 67]], [45, [60, 64, 69]], [43, [59, 62, 65]], [48, [60, 64, 67]], [48, [60, 64, 67]]],
-};
+/* ---------- sound: effects made in the browser, plus the game's own song ---------- */
+const GAME_SONG = 'audio/circus.mp3';
 const Sound = {
-  ctx: null, out: null, mus: null, noiseBuf: null, fxOn: true, musicOn: false, songEl: null, songName: '', timer: null, beat: 0, nextT: 0, starts: null,
-  load() { const p = lsGet('sound') || {}; this.fxOn = p.fx !== false; this.musicOn = !!p.music; },
+  ctx: null, out: null, noiseBuf: null, fxOn: true, musicOn: true, gameEl: null, songEl: null, songName: '',
+  load() { const p = lsGet('sound') || {}; this.fxOn = p.fx !== false; this.musicOn = p.music !== false; },
   save() { lsSet('sound', { fx: this.fxOn, music: this.musicOn }); },
   ensure() {
     if (!this.ctx) {
@@ -820,7 +723,6 @@ const Sound = {
       if (!AC) return null;
       try { this.ctx = new AC(); } catch { return null; }
       this.out = this.ctx.createGain(); this.out.gain.value = 0.55; this.out.connect(this.ctx.destination);
-      this.mus = this.ctx.createGain(); this.mus.gain.value = 0.32; this.mus.connect(this.out);
       const len = this.ctx.sampleRate, buf = this.ctx.createBuffer(1, len, len), d = buf.getChannelData(0);
       for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
       this.noiseBuf = buf;
@@ -828,12 +730,12 @@ const Sound = {
     if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
     return this.ctx;
   },
-  tone(f, t, dur, { type = 'triangle', vol = 0.16, to = 0, dest = null, attack = 0.006 } = {}) {
+  tone(f, t, dur, { type = 'triangle', vol = 0.16, to = 0, attack = 0.006 } = {}) {
     const c = this.ctx, o = c.createOscillator(), g = c.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t);
     if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(dest || this.out); o.start(t); o.stop(t + dur + 0.03);
+    o.connect(g); g.connect(this.out); o.start(t); o.stop(t + dur + 0.03);
   },
   noise(t, dur, { vol = 0.2, freq = 2000, to = 0, q = 1, type = 'bandpass' } = {}) {
     const c = this.ctx, src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
@@ -867,37 +769,22 @@ const Sound = {
       case 'win': [523, 659, 784].forEach((f, i) => T(f, t + i * 0.13, 0.16, { type: 'square', vol: 0.06 })); [1047, 1319, 1568].forEach(f => T(f, t + 0.42, 0.9, { vol: 0.1 })); break;
     }
   },
-  musicTick() {
-    const c = this.ctx; if (!c) return;
-    const spb = 60 / WALTZ.bpm, total = WALTZ.chords.length * 3;
-    if (!this.starts) { this.starts = new Map(); let b = 0; for (const [m, len] of WALTZ.melody) { this.starts.set(b, [m, len]); b += len; } }
-    while (this.nextT < c.currentTime + 0.3) {
-      const b = this.beat % total, t = this.nextT, [root, triad] = WALTZ.chords[Math.floor(b / 3)];
-      if (b % 3 === 0) this.tone(MIDI(root), t, spb * 0.9, { type: 'triangle', vol: 0.2, dest: this.mus });
-      else triad.forEach(m => this.tone(MIDI(m), t, spb * 0.35, { type: 'square', vol: 0.022, dest: this.mus }));
-      const note = this.starts.get(b);
-      if (note) {
-        const dur = note[1] * spb * 0.92;
-        this.tone(MIDI(note[0]), t, dur, { type: 'square', vol: 0.045, dest: this.mus, attack: 0.01 });
-        this.tone(MIDI(note[0]) * 1.003, t, dur, { type: 'triangle', vol: 0.09, dest: this.mus, attack: 0.01 });
-      }
-      this.beat++; this.nextT += spb;
-    }
+  player() {
+    if (this.songEl) return this.songEl;
+    if (!this.gameEl) { this.gameEl = new Audio(GAME_SONG); this.gameEl.loop = true; this.gameEl.volume = 0.45; this.gameEl.preload = 'none'; }
+    return this.gameEl;
   },
   startMusic() {
     if (!this.musicOn || document.hidden) return;
-    if (this.songEl) { this.stopSynth(); this.songEl.play().catch(() => {}); return; }
-    const c = this.ensure(); if (!c || c.state !== 'running' || this.timer) return;
-    this.beat = 0; this.nextT = c.currentTime + 0.1;
-    this.timer = setInterval(() => this.musicTick(), 80);
+    if (this.gameEl && this.songEl) this.gameEl.pause();
+    this.player().play().catch(() => {});
   },
-  stopSynth() { clearInterval(this.timer); this.timer = null; },
-  stopMusic() { this.stopSynth(); if (this.songEl) this.songEl.pause(); },
+  stopMusic() { if (this.gameEl) this.gameEl.pause(); if (this.songEl) this.songEl.pause(); },
   setSong(blob, name) {
-    if (this.songEl) { this.songEl.pause(); URL.revokeObjectURL(this.songEl.src); }
+    this.stopMusic();
+    if (this.songEl) URL.revokeObjectURL(this.songEl.src);
     this.songEl = null; this.songName = '';
     if (blob) { this.songEl = new Audio(URL.createObjectURL(blob)); this.songEl.loop = true; this.songEl.volume = 0.6; this.songName = name || 'melodia ta'; }
-    this.stopSynth();
     if (this.musicOn) this.startMusic();
   },
 };
@@ -913,7 +800,7 @@ function renderSound() {
   $('#soundBtn').innerHTML = Sound.fxOn || Sound.musicOn ? SPEAKER_ON : SPEAKER_OFF;
   $('#sfxOn').checked = Sound.fxOn;
   $('#musicOn').checked = Sound.musicOn;
-  $('#songLabel').textContent = Sound.songEl ? `Melodia ta: ${Sound.songName}` : 'Melodia de circ a jocului';
+  $('#songLabel').textContent = Sound.songEl ? `Melodia ta: ${Sound.songName}` : 'Melodia jocului: Circus Board Game';
   $('#clearSong').hidden = !Sound.songEl;
 }
 
@@ -1029,12 +916,6 @@ const shake = (el, a) => tween(460, t => place(el, a.x + Math.sin(t * Math.PI * 
 const squash = (el, p, k = 0.35, ms = 170) => tween(ms, t => { const q = Math.sin(Math.PI * t) * k; place(el, p.x, p.y, p.s, 0, 1 + q, 1 - q); });
 async function landWobble(el, p) { await tween(340, t => { const q = Math.sin(t * Math.PI * 3) * (1 - t) * 0.25; place(el, p.x, p.y, p.s, 0, 1 + q, 1 - q); }); place(el, p.x, p.y, p.s); }
 const anim = (node, frames, opts) => (node && node.animate && !REDUCED && !document.hidden ? node.animate(frames, opts).finished.catch(() => {}) : Promise.resolve());
-function dAnim(id, frames, opts = {}) {
-  const d = document.getElementById('Gd-' + id);
-  if (!d) return Promise.resolve();
-  d.style.transformOrigin = opts.origin || 'center';
-  return anim(d, frames, opts);
-}
 function particles(x, y, { n = 16, colors = ['#FFD84D', '#FF6B6B', '#6BCBFF', '#7CF29A', '#C38BFF'], dist = 80, life = 700, r = 6, rise = 0 } = {}) {
   if (REDUCED || document.hidden) return;
   const L = $('#fxTop');
@@ -1094,7 +975,7 @@ function follow(pt) {
   sc.scrollLeft = pt.x / 1260 * w - sc.clientWidth / 2;
 }
 
-/* ---------- one animation per arrow, themed on the picture next to it ---------- */
+/* ---------- one animation per arrow ---------- */
 const dust = p => particles(p.x, p.y, { n: 10, colors: ['#E8D6B5', '#D7BF93', '#F3E7CF'], dist: 42, r: 7, rise: 10 });
 const JUMPFX = {
   // 2 → 77: the pawn rides the rocket and lands in a firework.
@@ -1111,7 +992,6 @@ const JUMPFX = {
   },
   // 5 → 21: the poodle hops and the pawn jumps after it.
   5: async (el, a, b) => {
-    dAnim('poodle', [{ transform: 'translateY(0) rotate(0deg)' }, { transform: 'translateY(-28px) rotate(-8deg)' }, { transform: 'translateY(0) rotate(0deg)' }], { duration: 420, iterations: 2, easing: 'ease-in-out' });
     await squash(el, a, 0.38, 200); Sound.fx('boing');
     await tween(840, t => { const e = ease.inOut(t), p = along(a, b, e, 210); place(el, p.x, p.y, a.s, 360 * e); });
     dust(b); await landWobble(el, b);
@@ -1120,21 +1000,19 @@ const JUMPFX = {
   10: async (el, a, b) => {
     for (const h of [36, 72]) { Sound.fx('hop'); await tween(300, t => { const p = along(a, a, t, h); place(el, p.x, p.y, a.s, 0, 1, 1 + Math.sin(Math.PI * t) * 0.15); }); await squash(el, a, 0.3, 120); }
     Sound.fx('boing');
-    dAnim('clown', [{ transform: 'rotate(0deg) scale(1)' }, { transform: 'rotate(-12deg) scale(1.12)' }, { transform: 'rotate(10deg) scale(1.08)' }, { transform: 'rotate(0deg) scale(1)' }], { duration: 700 });
     await tween(920, t => { const e = ease.inOut(t), p = along(a, b, e, 170); place(el, p.x, p.y, a.s, -360 * e); });
     place(el, b.x, b.y, b.s); Sound.fx('pop');
     particles(b.x, b.y - 40, { n: 22, dist: 100 });
     await popSprite('popper', b.x - 46, b.y - 50, 56, 500);
   },
-  // 12 → 13: a quick somersault into the next row.
+  // 12 → 13: the chick flaps and the pawn somersaults into the next row.
   12: async (el, a, b) => {
     Sound.fx('hop');
     await tween(560, t => { const e = ease.inOut(t), p = along(a, b, e, 70); place(el, p.x, p.y, a.s, 360 * e); });
     particles(b.x, b.y - 30, { n: 12, colors: ['#FFE066', '#FFFFFF', '#C38BFF'], dist: 55, r: 4 });
   },
-  // 16 → 55: climb the red ladder with the chipmunk.
+  // 16 → 55: climb with the chipmunk, step by step.
   16: async (el, a, b) => {
-    dAnim('chipmunk', [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-10deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(0deg)' }], { duration: 360, iterations: 3 });
     let prev = a;
     for (let i = 1; i <= 8; i++) {
       const nx = along(a, b, i / 8); Sound.fx('step', i);
@@ -1143,7 +1021,7 @@ const JUMPFX = {
     }
     place(el, b.x, b.y, b.s);
   },
-  // 20 → 53: balloons lift the pawn and float away at the top.
+  // 20 → 53: the balloons lift the pawn, then float back home.
   20: async (el, a, b) => {
     const g = document.createElementNS(NS, 'g');
     g.innerHTML = '<g stroke="#6B6B6B" stroke-width="1.4" fill="none"><path d="M0-50q-10-18-18-38"/><path d="M0-50q2-24 2-50"/><path d="M0-50q10-18 18-36"/></g>'
@@ -1155,38 +1033,33 @@ const JUMPFX = {
     await anim(g, [{ transform: 'translate(0px,0px)', opacity: 1 }, { transform: 'translate(0px,-90px)', opacity: 0 }], { duration: 700, easing: 'ease-in' });
     g.remove();
   },
-  // 47 → 73: the parrot leaves its cage, carries the pawn and flies back.
+  // 47 → 73: the parrot carries the pawn and flies back to its square.
   47: async (el, a, b) => {
-    const home = DECOR_AT.parrot, dec = $('#Gd-parrot');
-    if (dec) dec.style.opacity = '0';
-    const bird = sprite('parrot', home.x, home.y, 78);
+    const home = spotXY(47);
+    const bird = sprite('parrot', home.x, home.y, 58);
     const put = (p, t) => bird.setAttribute('transform', `translate(${f1(p.x)} ${f1(p.y)}) scale(1 ${(1 - 0.25 * Math.abs(Math.sin(t * 22))).toFixed(3)})`);
     const over = p => ({ x: p.x, y: p.y - 76 * a.s });
     Sound.fx('flap');
-    await tween(420, t => put(along(home, over(a), ease.inOut(t), 40), t));
+    await tween(420, t => put(along(home, over(a), ease.inOut(t), 30), t));
     await tween(1100, t => { const p = along(a, b, ease.inOut(t), 30); place(el, p.x, p.y, a.s); put(over(p), t); });
     place(el, b.x, b.y, b.s); Sound.fx('flap');
     await tween(480, t => put(along(over(b), home, ease.inOut(t), 50), t));
-    bird.remove(); if (dec) dec.style.opacity = '';
+    bird.remove();
   },
   // 65 → 104: the seal heads the pawn up like a ball.
   65: async (el, a, b) => {
-    dAnim('seal', [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-14deg)' }, { transform: 'rotate(9deg)' }, { transform: 'rotate(0deg)' }], { duration: 620, origin: '60% 90%' });
-    dAnim('jballs', [{ transform: 'translateY(0)' }, { transform: 'translateY(-24px)' }, { transform: 'translateY(0)' }], { duration: 420, iterations: 2 });
     await squash(el, a, 0.4, 220); Sound.fx('boing');
     await tween(950, t => { const e = ease.out(t), p = along(a, b, e); place(el, p.x, p.y, a.s, 720 * e); if (rnd(4) === 0) particles(p.x, p.y - 20, { n: 1, colors: ['#FF6B6B', '#6BCBFF', '#FFE066'], dist: 30, r: 7 }); });
     place(el, b.x, b.y, b.s); await landWobble(el, b);
   },
   // 106 → 111: the teddy bear's spring launch, all squash and stretch.
   106: async (el, a, b) => {
-    dAnim('teddy', [{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(8px) scale(1.08,.9)' }, { transform: 'translateY(-14px) scale(.95,1.08)' }, { transform: 'translateY(0) scale(1)' }], { duration: 600 });
     await squash(el, a, 0.45, 260); Sound.fx('boing');
     await tween(520, t => { const p = along(a, b, ease.out(t)); place(el, p.x, p.y, a.s, 0, 1 - 0.25 * (1 - t), 1 + 0.45 * (1 - t)); });
     await landWobble(el, b);
   },
-  // 19 → 8: three bunny hops down to the rabbit.
+  // 19 → 8: three bunny hops down with the rabbit.
   19: async (el, a, b) => {
-    dAnim('rabbit', [{ transform: 'translateY(0)' }, { transform: 'translateY(-20px)' }, { transform: 'translateY(0)' }], { duration: 330, iterations: 3 });
     for (let i = 0; i < 3; i++) {
       const p0 = along(a, b, i / 3), p1 = along(a, b, (i + 1) / 3); Sound.fx('hop');
       await tween(330, t => { const p = along(p0, p1, t, 48); place(el, p.x, p.y, a.s, 0, 1, 1 + 0.12 * Math.sin(Math.PI * t)); });
@@ -1194,7 +1067,7 @@ const JUMPFX = {
     }
     place(el, b.x, b.y, b.s);
   },
-  // 64 → 39: drift down under the umbrella like a parachute.
+  // 64 → 39: take the umbrella and drift down like a parachute.
   64: async (el, a, b) => {
     const u = attach(el, 'umbrella', 0, -92, 86, 0, true);
     Sound.fx('whoosh');
@@ -1204,16 +1077,14 @@ const JUMPFX = {
     await anim(u.firstChild, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.3)', opacity: 0 }], { duration: 380 });
     u.remove();
   },
-  // 74 → 51: the elephant stomps and the pawn tumbles onto the ball.
+  // 74 → 51: the elephant stomps and the pawn tumbles down.
   74: async (el, a, b) => {
-    await dAnim('elephant', [{ transform: 'rotate(0deg) translateY(0)' }, { transform: 'rotate(-6deg) translateY(-8px)' }, { transform: 'rotate(5deg) translateY(0)' }, { transform: 'rotate(0deg) translateY(0)' }], { duration: 480, origin: '50% 95%' });
     Sound.fx('thud');
     await tween(950, t => { const e = ease.in(t), p = along(a, b, e, 50); place(el, p.x, p.y, a.s, 540 * e); });
-    place(el, b.x, b.y, b.s); Sound.fx('thud');
-    dAnim('eball', [{ transform: 'scale(1,1)' }, { transform: 'scale(1.08,.86)' }, { transform: 'scale(1,1)' }], { duration: 320, origin: '50% 100%' });
+    place(el, b.x, b.y, b.s); Sound.fx('thud'); dust(b);
     await landWobble(el, b);
   },
-  // 100 → 66: a spinning crash with smoke, then you see stars.
+  // 100 → 66: the juggler drops you; a spinning fall, smoke, then stars.
   100: async (el, a, b) => {
     Sound.fx('crash');
     let k = 0;
@@ -1226,7 +1097,6 @@ const JUMPFX = {
   },
   // 108 → 61: two backflips down with the acrobat.
   108: async (el, a, b) => {
-    dAnim('acrobat', [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-360deg)' }], { duration: 900 });
     Sound.fx('whoosh');
     await squash(el, a, 0.3, 150);
     await tween(1100, t => { const e = ease.inOut(t), p = along(a, b, e, 80); place(el, p.x, p.y, a.s, -720 * e); });
@@ -1236,15 +1106,13 @@ const JUMPFX = {
   },
   // 114 → 102: the horse bucks and kicks the pawn away.
   114: async (el, a, b) => {
-    await dAnim('horse', [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-16deg)' }, { transform: 'rotate(0deg)' }], { duration: 440, origin: '25% 95%' });
     Sound.fx('kick');
     popSprite('collision', a.x + 22, a.y - 34, 60, 150);
     await tween(900, t => { const e = ease.out(t), p = along(a, b, e, 150); place(el, p.x, p.y, a.s, -360 * e); });
     place(el, b.x, b.y, b.s); dust(b); await landWobble(el, b);
   },
-  // 119 → 96: slide down the green ladder past the laughing monkey.
+  // 119 → 96: a fast slide down while the monkey laughs.
   119: async (el, a, b) => {
-    dAnim('monkey', [{ transform: 'scale(1) rotate(0deg)' }, { transform: 'scale(1.12) rotate(-6deg)' }, { transform: 'scale(1) rotate(0deg)' }], { duration: 300, iterations: 3 });
     Sound.fx('slide');
     let k = 0;
     await tween(720, t => { const p = along(a, b, ease.in(t)); place(el, p.x, p.y, a.s, -22); if (k++ % 2 === 0) particles(p.x + 10, p.y - 30, { n: 1, colors: ['#FFFFFF'], dist: 18, r: 5, life: 400 }); });
@@ -1976,8 +1844,8 @@ setInterval(() => { if (S.view === 'game' && S.game && !S.animating) { if (S.gam
   S.pid = pid;
   const lg = lsGet('local');
   if (lg && validGame(lg) && lg.code === 'LOCAL') S.localGame = clean({ ...lg, local: true });
-  $('#art').innerHTML = boardSVG('G');
-  $('#heroBoard').innerHTML = boardSVG('L');
+  $('#art').innerHTML = boardSVG();
+  $('#heroBoard').innerHTML = boardSVG();
   Sound.load();
   idb.get('song').then(blob => { if (blob) idb.get('songName').then(n => { Sound.setSong(blob, n || 'melodia ta'); renderSound(); }); }).catch(() => {});
   $('#prefName').value = S.prefs.name;
