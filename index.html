@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B7A41">
+<meta name="description" content="Sus-Jos online: tabla de circ cu 120 de căsuțe, zar și săgeți care urcă și coboară. Până la 10 jucători, fără cont.">
+<title>Sus-Jos</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%23FFDD24' stroke='%232B2200' stroke-width='4'/%3E%3Ccircle cx='20' cy='20' r='6' fill='%232B2200'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232B2200'/%3E%3Ccircle cx='44' cy='44' r='6' fill='%232B2200'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: felt-green marquee header with the board's patterned trim; lobby = board photo + "who plays" card, recent games + rules;
+   game = the real board photo with a START strip, turn bar under it, players/log beside it on wide screens and stacked on phones. */
+:root {
+  --bg: #E6EEE4;
+  --surface: #FFFFFF;
+  --surface-2: #F1F6EF;
+  --ink: #15241B;
+  --muted: #586B5F;
+  --line: #D0DCD2;
+  --chip: #E9F0E7;
+  --felt: #0B7A41;
+  --felt-deep: #075C30;
+  --felt-ink: #FFFFFF;
+  --trim-a: #B9EE9C;
+  --trim-b: #EAFBE0;
+  --canary: #FFDD24;
+  --canary-deep: #E3BF00;
+  --canary-ink: #2B2200;
+  --up: #12854A;
+  --down: #D2302A;
+  --focus: #1F5FD6;
+  --shadow: 0 1px 2px rgba(10, 40, 20, .08), 0 8px 22px rgba(10, 40, 20, .09);
+  --die-bg: #FFFFFF;
+  --die-edge: #1C1C1C;
+  --pip: #1C1C1C;
+  --overlay-bg: rgba(8, 22, 14, .74);
+  --overlay-ink: #FFFFFF;
+  --fx-up: #0F9446;
+  --fx-down: #E0262B;
+  --font-display: "Bungee", "Arial Black", Impact, system-ui, sans-serif;
+  --font-body: "Fredoka", "Trebuchet MS", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 16px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A1510; --surface: #13221A; --surface-2: #182A20; --ink: #E7F1EA; --muted: #97AD9F; --line: #274032;
+    --chip: #D8E4DA; --felt: #0D8547; --felt-deep: #08512B; --felt-ink: #FFFFFF; --trim-a: #4E9E5C; --trim-b: #9CD69A;
+    --canary: #FFDA1F; --canary-deep: #D2B000; --canary-ink: #231B00; --up: #45CF82; --down: #FF6B5F; --focus: #86AEFF;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 26px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+h1, h2, h3 { text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+
+/* Header */
+.marquee { background: var(--felt); color: var(--felt-ink); padding-top: env(safe-area-inset-top, 0px); }
+.marquee::after { content: ""; display: block; height: 7px; background: repeating-linear-gradient(135deg, var(--trim-a) 0 5px, var(--trim-b) 5px 10px); }
+.mq-in { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 10px; display: flex; align-items: center; gap: 10px; min-height: 60px; }
+.logo { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 27px; line-height: 1; letter-spacing: .02em; color: var(--canary); display: flex; align-items: center; gap: 4px; }
+.logo svg { width: 17px; height: 24px; flex: none; }
+.back { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px 0 6px; border-radius: 999px; border: 0; background: rgba(0, 0, 0, .2); color: var(--felt-ink); font-weight: 600; cursor: pointer; flex: none; }
+.code-chip { margin-left: auto; display: flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, .2); border-radius: 999px; padding: 4px 4px 4px 12px; min-width: 0; }
+.code-chip .cc-label { font-size: 13px; opacity: .85; }
+.code-chip b { font-family: var(--font-display); font-weight: 400; font-size: 17px; letter-spacing: .08em; color: var(--canary); white-space: nowrap; }
+.net { width: 9px; height: 9px; border-radius: 50%; background: #F5B400; flex: none; }
+.net.on { background: #7CF29A; }
+.cc-copy { border: 0; border-radius: 999px; min-height: 34px; padding: 0 12px; background: var(--felt-ink); color: var(--felt-deep); font-weight: 600; cursor: pointer; flex: none; }
+@media (max-width: 560px) {
+  body.in-game .logo { display: none; }
+  body.in-game .back span { display: none; }
+  body.in-game .back { padding: 0 8px; }
+  .code-chip .cc-label { display: none; }
+}
+
+/* Page */
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 18px calc(56px + env(safe-area-inset-bottom, 0px)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; min-width: 0; }
+.card h2 { margin: 0 0 12px; font-size: 21px; font-weight: 600; }
+.card h3 { margin: 0 0 10px; font-size: 17px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+.card h3 .count { color: var(--muted); font-weight: 500; font-size: 14px; font-variant-numeric: tabular-nums; }
+.empty { margin: 0; color: var(--muted); font-size: 15px; }
+.note-banner { margin: 0 0 14px; background: color-mix(in srgb, var(--canary) 28%, var(--surface)); border: 1px solid var(--canary-deep); border-radius: 12px; padding: 10px 14px; font-size: 15px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); font-weight: 600; cursor: pointer; text-align: center; }
+.btn.primary { background: var(--canary); color: var(--canary-ink); border: 2px solid var(--canary-ink); box-shadow: 0 4px 0 var(--canary-ink); font-family: var(--font-display); font-weight: 400; letter-spacing: .03em; }
+.btn.primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--canary-ink); }
+.btn:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+.btn.ghost { background: transparent; }
+.btn.small { min-height: 38px; padding: 0 12px; font-size: 14.5px; }
+.btn.danger { color: var(--down); border-color: color-mix(in srgb, var(--down) 45%, var(--line)); background: transparent; }
+@media (hover: hover) {
+  .btn:not(:disabled):hover { border-color: var(--felt); }
+  .btn.primary:not(:disabled):hover { filter: brightness(1.04); border-color: var(--canary-ink); }
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; min-width: 0; }
+.field > span { font-size: 14px; font-weight: 600; color: var(--muted); }
+.field input { width: 100%; min-height: 48px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); padding: 0 14px; font-size: 17px; }
+.field input:focus { border-color: var(--felt); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--felt) 25%, transparent); }
+
+.swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.sw { aspect-ratio: 1; max-height: 58px; border-radius: 12px; border: 2px solid transparent; background: var(--chip); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.sw[aria-checked="true"] { border-color: var(--canary-ink); box-shadow: 0 0 0 3px var(--canary); }
+.sw:disabled { opacity: .22; cursor: not-allowed; }
+.mp { display: block; overflow: visible; }
+.ava { display: inline-block; border-radius: 50%; border: 3px solid var(--pc); background: var(--chip); overflow: hidden; flex: none; }
+.ava img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.picrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pic-prev { width: 64px; height: 72px; border-radius: 12px; background: var(--chip); display: grid; place-items: center; flex: none; }
+.pic-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Lobby */
+.lobby { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-areas: "hero me" "list rules"; gap: 20px; align-items: start; }
+.hero { grid-area: hero; margin: 0; }
+.hero img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: var(--shadow); }
+.me { grid-area: me; }
+.list { grid-area: list; }
+.rules { grid-area: rules; }
+@media (max-width: 900px) { .lobby { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "me" "list" "rules"; gap: 16px; } }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+.actions .big { min-height: 54px; font-size: 18px; padding: 0 22px; flex: 1 1 180px; }
+.codeform { display: flex; gap: 8px; flex: 1 1 220px; }
+.codeform input { width: 100%; min-width: 0; min-height: 54px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); padding: 0 10px; font-family: var(--font-display); font-size: 18px; letter-spacing: .08em; text-transform: uppercase; text-align: center; }
+.codeform input:focus { border-color: var(--felt); outline: none; }
+.codeform .btn { min-height: 54px; }
+.hint { margin: 12px 0 0; font-size: 14.5px; color: var(--muted); }
+.local-row { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.local-row p { margin: 0; font-size: 14px; color: var(--muted); flex: 1 1 200px; }
+
+.glist { display: flex; flex-direction: column; gap: 8px; }
+.grow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+@media (hover: hover) { .grow:hover { border-color: var(--felt); } }
+.gcode { font-family: var(--font-display); font-size: 16px; letter-spacing: .06em; color: var(--felt); white-space: nowrap; }
+.gmeta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gtop { display: flex; gap: 6px; flex-wrap: wrap; }
+.gnames { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; color: var(--muted); }
+.gright { display: flex; align-items: center; gap: 8px; }
+.gdots { display: flex; }
+.gdots .mp { margin-left: -5px; }
+.gcount { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; color: var(--muted); }
+@media (max-width: 520px) { .gdots { display: none; } }
+.chip { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; width: max-content; }
+.st-lobby { background: color-mix(in srgb, var(--canary) 50%, transparent); color: var(--ink); }
+.st-playing { background: color-mix(in srgb, var(--up) 18%, transparent); color: var(--up); }
+.st-done { border: 1px solid var(--line); color: var(--muted); }
+.st-win { background: var(--canary); color: var(--canary-ink); margin-left: 4px; }
+
+.howto { margin: 0 0 14px; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.legend-group { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px; align-items: start; margin-bottom: 8px; }
+.legend-group > b { font-size: 14px; padding-top: 3px; }
+.legend-group.up > b { color: var(--up); }
+.legend-group.down > b { color: var(--down); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.leg { font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 600; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+.up .leg { background: color-mix(in srgb, var(--up) 14%, transparent); color: var(--up); }
+.down .leg { background: color-mix(in srgb, var(--down) 13%, transparent); color: var(--down); }
+.privacy { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
+
+/* Game */
+.game { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 20px; align-items: start; }
+@media (max-width: 920px) { .game { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+.gmain { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.board-wrap { position: relative; border-radius: 14px; overflow: hidden; background: var(--felt-deep); box-shadow: var(--shadow); }
+.board-scroll { overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+#board { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+.board-scroll.zoomed #board { width: 190%; }
+.zoom-btn { position: absolute; right: 6px; bottom: 3px; display: none; align-items: center; min-height: 26px; padding: 0 11px; border-radius: 999px; border: 0; background: var(--overlay-bg); color: var(--overlay-ink); font-weight: 600; font-size: 13px; cursor: pointer; }
+@media (max-width: 920px) { .zoom-btn { display: inline-flex; } .strip-hint { display: none; } }
+.win { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 8px; border-radius: 999px; background: var(--canary); color: var(--canary-ink); border: 2px solid var(--canary-ink); box-shadow: 0 4px 0 var(--canary-ink); font-family: var(--font-display); font-size: clamp(14px, 3.2vw, 22px); white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; pointer-events: none; }
+#confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.strip { fill: var(--felt-deep); }
+.strip-label { font-family: var(--font-display); font-size: 40px; fill: var(--canary); }
+.strip-hint { font-family: var(--font-body); font-weight: 600; font-size: 25px; fill: var(--felt-ink); opacity: .85; }
+.pawn .rings { transform-box: fill-box; transform-origin: center; }
+.pawn .ring-out { fill: none; stroke: #FFFFFF; stroke-width: 8; opacity: 0; }
+.pawn .ring-in { fill: none; stroke: #111111; stroke-width: 3.5; opacity: 0; }
+.pawn.is-turn .ring-out, .pawn.is-turn .ring-in { opacity: 1; }
+.pawn.is-turn .rings { animation: ring 1.15s ease-in-out infinite; }
+@keyframes ring { 50% { transform: scale(1.28); } }
+.fx-label { font-family: var(--font-display); font-size: 52px; paint-order: stroke; stroke: #FFFFFF; stroke-width: 11px; stroke-linejoin: round; }
+.fx-label.up { fill: var(--fx-up); }
+.fx-label.down { fill: var(--fx-down); }
+
+.turnbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; transition: box-shadow .25s, border-color .25s; }
+.turnbar.mine { border-color: var(--canary-deep); box-shadow: 0 0 0 3px color-mix(in srgb, var(--canary) 60%, transparent); }
+.turn-text { min-width: 0; }
+.turn-main { margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
+.turn-sub { margin: 5px 0 0; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+.turn-sub b, .log b { color: var(--ink); font-weight: 600; }
+.turn-sub .up, .log .up { color: var(--up); font-weight: 600; }
+.turn-sub .down, .log .down { color: var(--down); font-weight: 600; }
+.turn-sub .warn { color: var(--down); font-weight: 600; }
+.code-inline { font-family: var(--font-display); font-weight: 400; letter-spacing: .06em; }
+.turn-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.roll { min-height: 56px; font-size: 18px; padding: 0 22px; }
+@media (max-width: 600px) {
+  .turnbar { grid-template-columns: auto minmax(0, 1fr); padding: 12px; }
+  .turn-actions { grid-column: 1 / -1; }
+  .turn-main { font-size: 18px; }
+}
+
+.die { width: 58px; height: 58px; flex: none; background: var(--die-bg); border: 2px solid var(--die-edge); border-radius: 13px; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .09), 0 3px 8px rgba(0, 0, 0, .2); display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 7px; }
+.die i { width: 11px; height: 11px; border-radius: 50%; place-self: center; }
+.die i.on { background: var(--pip); }
+.die.face1 i.on { background: var(--fx-down); width: 15px; height: 15px; }
+.die.rolling { animation: tumble .44s linear infinite; }
+.die.landed { animation: land .38s ease-out; }
+@keyframes tumble { 0% { transform: rotate(0); } 25% { transform: rotate(95deg) translateY(-5px) scale(.93); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg) translateY(-4px) scale(.94); } 100% { transform: rotate(360deg); } }
+@keyframes land { 0% { transform: scale(1.2); } 60% { transform: scale(.95); } 100% { transform: scale(1); } }
+
+.join-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px; }
+@media (max-width: 640px) { .join-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+.join .btn.primary { width: 100%; min-height: 52px; }
+
+.players { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pl { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; }
+.pl.is-turn { background: color-mix(in srgb, var(--canary) 34%, var(--surface)); }
+.chipbg { position: relative; width: 40px; height: 40px; border-radius: 11px; background: var(--chip); display: grid; place-items: center; }
+.dot { position: absolute; right: -3px; bottom: -3px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); border: 2px solid var(--surface); }
+.dot.on { background: var(--up); }
+.pl-mid { min-width: 0; }
+.pl-name { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-name em { font-style: normal; color: var(--muted); font-weight: 500; }
+.bar { display: block; height: 5px; border-radius: 3px; background: var(--line); margin-top: 5px; overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 3px; transition: width .4s ease; }
+.pl-pos { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--muted); text-align: right; min-width: 44px; }
+.pl-pos b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--ink); }
+.mypic { margin-top: 10px; }
+
+.log { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow: auto; display: flex; flex-direction: column; gap: 7px; font-size: 14.5px; color: var(--muted); }
+.log li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; align-items: start; }
+.toggle { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; padding: 6px 0; cursor: pointer; }
+.toggle input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--felt); }
+.toggle b { display: block; font-weight: 600; }
+.toggle small { display: block; color: var(--muted); font-size: 13.5px; }
+.quiet { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 50; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 12px; max-width: calc(100% - 32px); width: max-content; font-weight: 500; box-shadow: var(--shadow); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+  .board-scroll { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<header class="marquee">
+  <div class="mq-in">
+    <button class="back" type="button" data-act="back" id="backBtn" hidden aria-label="Înapoi la început">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Partide</span>
+    </button>
+    <h1 class="logo" aria-label="Sus-Jos">SUS<svg viewBox="0 0 17 24" aria-hidden="true"><path d="M8.5 2v20M2 9l6.5-7L15 9" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>JOS<svg viewBox="0 0 17 24" aria-hidden="true"><path d="M8.5 22V2M2 15l6.5 7 6.5-7" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>
+    <div class="code-chip" id="codeChip" hidden>
+      <span class="net" id="netDot" title="Conexiune"></span><span class="cc-label">Cod</span><b id="codeTxt"></b>
+      <button type="button" class="cc-copy" data-act="share">Trimite</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="vLobby" class="lobby">
+    <figure class="hero">
+      <img src="board.jpg" alt="Tabla Sus-Jos: 120 de căsuțe, săgeți care urcă și coboară, cu animale de circ" width="1260" height="818">
+    </figure>
+
+    <div class="card me">
+      <p class="note-banner" id="connNote" hidden></p>
+      <h2>Cine joacă?</h2>
+      <label class="field"><span>Porecla ta</span><input id="prefName" maxlength="14" autocomplete="nickname" placeholder="ex. Matei"></label>
+      <div class="field"><span id="pcLabel">Culoarea pionului</span><div id="prefPicker"></div></div>
+      <div class="field"><span>Poza de pe pion (dacă vrei)</span>
+        <div class="picrow"><span class="pic-prev" id="prefPicPrev"></span>
+          <span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="me">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearPic" id="prefPicClear" hidden>Scoate poza</button></span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary big" type="button" data-act="create" id="createBtn">Partidă nouă</button>
+        <form class="codeform" id="codeForm" autocomplete="off">
+          <label class="sr" for="codeInput">Codul partidei</label>
+          <input id="codeInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" spellcheck="false">
+          <button class="btn" type="submit">Intră</button>
+        </form>
+      </div>
+      <p class="hint">Unul face partida nouă și le trimite celorlalți linkul. Cine are doar codul îl scrie aici și apasă „Intră”.</p>
+      <div class="local-row">
+        <p>Sunteți toți la aceeași masă? Jucați pe rând pe un singur telefon.</p>
+        <button class="btn small" type="button" data-act="local">Joc pe un telefon</button>
+      </div>
+    </div>
+
+    <div class="card list">
+      <h2>Partidele tale</h2>
+      <div id="gameList" class="glist"></div>
+    </div>
+
+    <div class="card rules">
+      <h2>Cum se joacă</h2>
+      <ol class="howto">
+        <li>Toți pornesc de la START. La rândul tău dai cu zarul și muți pionul atâtea căsuțe.</li>
+        <li>Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori.</li>
+        <li>Câștigă primul care ajunge exact pe 120.</li>
+      </ol>
+      <h3>Săgețile de pe tablă</h3>
+      <div id="legend"></div>
+      <p class="privacy">Nu ai nevoie de cont. Mutările trec printr-un server public gratuit, dar sunt criptate cu codul partidei: doar cine are codul vede jocul, numele și pozele.</p>
+    </div>
+  </section>
+
+  <section id="vGame" class="game" hidden>
+    <div class="gmain">
+      <div class="board-wrap">
+        <div class="board-scroll" id="boardScroll">
+          <svg id="board" viewBox="0 0 1260 898" role="img" aria-label="Tabla de joc cu pionii jucătorilor">
+            <rect class="strip" x="0" y="800" width="1260" height="98"/>
+            <image href="board.jpg" x="0" y="0" width="1260" height="818" preserveAspectRatio="none"/>
+            <text class="strip-label" x="30" y="876">START</text>
+            <text class="strip-hint" x="1232" y="868" text-anchor="end">primul pe 120 câștigă</text>
+            <g id="fx"></g>
+            <g id="pawns"></g>
+            <g id="fxTop"></g>
+          </svg>
+        </div>
+        <button class="zoom-btn" type="button" data-act="zoom" id="zoomBtn" aria-pressed="false">Mărește tabla</button>
+        <div class="win" id="winBanner" hidden></div>
+        <canvas id="confetti" hidden></canvas>
+      </div>
+      <div class="turnbar" id="turnbar">
+        <div class="die" id="die" aria-hidden="true"></div>
+        <div class="turn-text"><p class="turn-main" id="turnMain"></p><p class="turn-sub" id="turnSub" aria-live="polite"></p></div>
+        <div class="turn-actions" id="turnActions" hidden></div>
+      </div>
+      <div class="card join" id="joinCard" hidden></div>
+    </div>
+    <aside class="side">
+      <div class="card" id="playersCard"></div>
+      <div class="card" id="logCard"></div>
+      <div class="card" id="rulesCard"></div>
+      <div class="quiet" id="dangerCard" hidden></div>
+    </aside>
+  </section>
+</main>
+<input type="file" id="picInput" accept="image/*" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>
+(() => {
+'use strict';
+const NS = 'http://www.w3.org/2000/svg';
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MAXP = 10, LAST = 120;
+
+const COLORS = [
+  { n: 'Roșu', f: '#E3262C', s: '#6E0B10' },
+  { n: 'Albastru', f: '#2264DC', s: '#0A2A6B' },
+  { n: 'Verde', f: '#19A34A', s: '#08471E' },
+  { n: 'Mov', f: '#8B3DCC', s: '#3B1060' },
+  { n: 'Portocaliu', f: '#F57A0C', s: '#723200' },
+  { n: 'Roz', f: '#F25BAA', s: '#7A1450' },
+  { n: 'Turcoaz', f: '#12B6B2', s: '#05524F' },
+  { n: 'Maro', f: '#8A5430', s: '#38200E' },
+  { n: 'Negru', f: '#26262B', s: '#000000' },
+  { n: 'Alb', f: '#F8F8F3', s: '#4B4B4B' },
+];
+
+// Every arrow on the printed board: [from, to, arrow colour]. Up when to > from.
+const ARROWS = [
+  [2, 77, '#E8358C'], [5, 21, '#F08A24'], [10, 37, '#1E8FD2'], [12, 13, '#6A4BA3'], [16, 55, '#178A48'],
+  [20, 53, '#1E8FD2'], [47, 73, '#1E8FD2'], [65, 104, '#178A48'], [106, 111, '#6A4BA3'],
+  [19, 8, '#E8358C'], [64, 39, '#E2312B'], [74, 51, '#178A48'], [100, 66, '#7B4FB8'],
+  [108, 61, '#E8358C'], [114, 102, '#F08A24'], [119, 96, '#E2312B'],
+];
+const JUMP = {}, ARROW_COLOR = {};
+for (const [a, b, c] of ARROWS) { JUMP[a] = b; ARROW_COLOR[a] = c; }
+
+// Board geometry in the units of the straightened board photo (1260 × 818); START strip below it.
+const GX0 = 32, GX1 = 1226, GY0 = 28, GY1 = 792;
+const CW = (GX1 - GX0) / 12, RH = (GY1 - GY0) / 10;
+function cellXY(n) {
+  const r = Math.floor((n - 1) / 12), i = (n - 1) % 12, c = r % 2 === 0 ? i : 11 - i;
+  return { x: GX0 + (c + 0.5) * CW, y: GY1 - (r + 0.5) * RH };
+}
+const startXY = i => ({ x: 258 + i * 66, y: 888 });
+
+function rnd(n) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+const rid = () => Date.now().toString(36) + rnd(2e9).toString(36);
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const CODE_ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const genCode = () => Array.from({ length: 8 }, () => CODE_ALPH[rnd(CODE_ALPH.length)]).join('');
+const normCode = s => { const u = String(s || '').toUpperCase(); return u === 'LOCAL' ? u : [...u].filter(c => CODE_ALPH.includes(c)).join('').slice(0, 8); };
+const fmtCode = c => (c && c.length === 8 ? c.slice(0, 4) + '-' + c.slice(4) : c || '');
+
+// ?p=2 gives a second identity in the same browser (handy for trying two players on one computer).
+const NSP = 'susjos' + (new URLSearchParams(location.search).get('p') || '').replace(/[^a-z0-9]/gi, '').slice(0, 8) + ':';
+function lsGet(k) { try { return JSON.parse(localStorage.getItem(NSP + k)); } catch { return null; } }
+function lsSet(k, v) { try { if (v == null) localStorage.removeItem(NSP + k); else localStorage.setItem(NSP + k, JSON.stringify(v)); } catch {} }
+
+const S = {
+  pid: '', prefs: { name: '', color: 0, pic: '' },
+  view: 'lobby', code: null, game: null, missing: false, firstSnap: true, gen: 0, localGame: null,
+  room: null, brokerBest: {}, pics: new Map(), seenAt: new Map(),
+  seen: new Set(), celebrated: new Set(), queue: [], animating: false, animText: '', animWho: null, animRid: null,
+  pendingRoll: false, myRid: null, spinning: false, spinT: 0, spinTimer: null, lastDie: 5,
+  shown: {}, pp: {}, zoom: false, joinColor: null, localPic: '', picFor: 'me', confirm: null, lastAct: null, buzzed: null,
+};
+
+/* ---------- data hygiene ---------- */
+const cleanName = s => String(s || '').replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, '').replace(/\s+/g, ' ').trim().slice(0, 14);
+const int = (v, lo, hi) => { v = Math.round(Number(v)); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : lo; };
+const num = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
+const ID_RE = /^[A-Za-z0-9_.-]{1,64}$/;
+const validPic = s => typeof s === 'string' && s.length < 120000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(s);
+const validGame = d => !!d && typeof d.code === 'string' && /^([A-Z2-9]{8}|LOCAL)$/.test(d.code) && Array.isArray(d.players);
+
+function cleanMove(e) {
+  if (!e || typeof e !== 'object' || !e.rid) return null;
+  return { rid: String(e.rid).slice(0, 40), by: String(e.by || '').slice(0, 64), n: cleanName(e.n) || 'Cineva', c: int(e.c, 0, 9), r: int(e.r, 1, 6), f: int(e.f, 0, LAST), m: int(e.m, 0, LAST), t: int(e.t, 0, LAST), b: !!e.b, at: num(e.at) };
+}
+function cleanLog(e) {
+  if (!e || typeof e !== 'object') return null;
+  const k = String(e.k || '').slice(0, 12);
+  if (k === 'move') { const m = cleanMove(e); return m ? { k, ...m } : null; }
+  const out = { k, n: cleanName(e.n), at: num(e.at) };
+  if (e.c != null) out.c = int(e.c, 0, 9);
+  if (Array.isArray(e.o)) out.o = e.o.slice(0, MAXP).map(x => cleanName(x) || 'Jucător');
+  return out;
+}
+function clean(d) {
+  const local = !!d.local, players = [], ids = new Set();
+  for (const p of Array.isArray(d.players) ? d.players : []) {
+    if (!p || typeof p.id !== 'string' || !ID_RE.test(p.id) || ids.has(p.id) || players.length >= MAXP) continue;
+    ids.add(p.id);
+    const q = { id: p.id, name: cleanName(p.name) || 'Jucător', color: int(p.color, 0, 9), pos: int(p.pos, 0, LAST) };
+    if (local && validPic(p.pic)) q.pic = p.pic;
+    players.push(q);
+  }
+  const status = ['lobby', 'playing', 'done'].includes(d.status) ? d.status : 'lobby';
+  return {
+    v: 1, code: d.code, local, status,
+    rules: { bounce: !(d.rules && d.rules.bounce === false), six: !!(d.rules && d.rules.six) },
+    players, turn: players.length ? int(d.turn, 0, players.length - 1) : 0, turnAt: num(d.turnAt),
+    rev: num(d.rev), wid: typeof d.wid === 'string' ? d.wid.slice(0, 96) : '',
+    last: cleanMove(d.last), log: (Array.isArray(d.log) ? d.log : []).slice(-60).map(cleanLog).filter(Boolean),
+    winner: typeof d.winner === 'string' ? d.winner : null, createdAt: num(d.createdAt), updatedAt: num(d.updatedAt),
+  };
+}
+const trimLog = g => { if (g.log.length > 50) g.log = g.log.slice(-50); };
+// Total order on versions of a game: higher rev wins, ties broken by writer id so every device picks the same one.
+const cmp = (a, b) => (a.rev - b.rev) || (a.wid > b.wid ? 1 : a.wid < b.wid ? -1 : 0);
+
+/* ---------- rules ---------- */
+function applyRoll(g, uid, roll, id, now) {
+  if (g.status !== 'playing' || !g.players.length) return null;
+  const p = g.players[g.turn];
+  if (!p || p.id !== uid) return null;
+  const from = p.pos;
+  let mid = from + roll, bounced = false;
+  if (mid > LAST) { if (g.rules.bounce) { mid = 2 * LAST - mid; bounced = true; } else mid = from; }
+  const moved = mid !== from || bounced;
+  const to = moved && JUMP[mid] ? JUMP[mid] : mid;
+  p.pos = to;
+  const mv = { rid: id, by: p.id, n: p.name, c: p.color, r: roll, f: from, m: mid, t: to, b: bounced, at: now };
+  g.last = mv;
+  g.log.push({ k: 'move', ...mv });
+  if (to === LAST) { g.status = 'done'; g.winner = p.id; }
+  else if (!(roll === 6 && g.rules.six)) g.turn = (g.turn + 1) % g.players.length;
+  g.turnAt = now; g.rev++; trimLog(g);
+  return g;
+}
+function pathOf(L) {
+  const s = [];
+  if (L.b) { for (let k = L.f + 1; k <= LAST; k++) s.push(k); for (let k = LAST - 1; k >= L.m; k--) s.push(k); }
+  else for (let k = L.f + 1; k <= L.m; k++) s.push(k);
+  return s;
+}
+function begin(g, kind) {
+  const now = Date.now();
+  shuffle(g.players);
+  g.players.forEach(p => { p.pos = 0; });
+  g.status = 'playing'; g.turn = 0; g.turnAt = now; g.winner = null; g.last = null;
+  g.log.push({ k: kind, o: g.players.map(p => p.name), at: now });
+  trimLog(g); g.rev++;
+  return g;
+}
+function freeColor(g, want) {
+  const taken = new Set(g.players.map(p => p.color));
+  if (want != null && !taken.has(want)) return want;
+  for (let c = 0; c < COLORS.length; c++) if (!taken.has(c)) return c;
+  return 0;
+}
+
+/* ---------- encryption: the game code is the only key ---------- */
+const te = new TextEncoder(), td = new TextDecoder();
+function b64(u8) { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function unb64(s) { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+const hex = u8 => Array.from(u8, x => x.toString(16).padStart(2, '0')).join('');
+const roomCache = new Map();
+async function deriveRoom(code) {
+  if (roomCache.has(code)) return roomCache.get(code);
+  const base = await crypto.subtle.importKey('raw', te.encode(code), 'PBKDF2', false, ['deriveBits']);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: te.encode('sus-jos/v1'), iterations: 120000, hash: 'SHA-256' }, base, 512));
+  const key = await crypto.subtle.importKey('raw', bits.slice(32), { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+  const room = { code, topic: 'susjos1/' + hex(bits.slice(0, 16)), key };
+  roomCache.set(code, room);
+  return room;
+}
+async function seal(room, obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, room.key, te.encode(JSON.stringify(obj))));
+  const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+  return 'v1.' + b64(out);
+}
+async function unseal(room, str) {
+  if (!str.startsWith('v1.')) throw new Error('format');
+  const u = unb64(str.slice(3));
+  return JSON.parse(td.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u.subarray(0, 12) }, room.key, u.subarray(12))));
+}
+
+/* ---------- message bus: two free public MQTT brokers, used side by side ---------- */
+const BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt'];
+const Bus = {
+  clients: [], subs: new Set(), upSince: 0,
+  start() {
+    if (this.clients.length || !window.mqtt) return;
+    BROKERS.forEach((url, i) => {
+      const c = window.mqtt.connect(url, { clientId: 'sj_' + rid().slice(-14), clean: true, keepalive: 30, reconnectPeriod: 2500, connectTimeout: 10000, protocolVersion: 4 });
+      const b = { i, c, up: false };
+      c.on('connect', () => {
+        b.up = true; b.connAt = Date.now();
+        if (!this.upSince) this.upSince = Date.now();
+        for (const t of this.subs) c.subscribe(t, { qos: 1 });
+        onBusChange(b);
+      });
+      c.on('close', () => { if (b.up) { b.up = false; onBusChange(b); } });
+      c.on('error', () => {});
+      c.on('message', (topic, payload) => onMessage(topic, payload, i));
+      this.clients.push(b);
+    });
+  },
+  up() { return this.clients.some(b => b.up); },
+  sub(t) { this.subs.add(t); for (const b of this.clients) if (b.up) b.c.subscribe(t, { qos: 1 }); },
+  unsub(t) { this.subs.delete(t); for (const b of this.clients) if (b.up) b.c.unsubscribe(t); },
+  pub(t, msg, retain, only) { for (const b of this.clients) if (only == null || only === b.i) b.c.publish(t, msg, { qos: retain ? 1 : 0, retain: !!retain }); },
+  ready(ms) {
+    if (this.up()) return Promise.resolve(true);
+    return new Promise(res => { const t0 = Date.now(); const iv = setInterval(() => { if (this.up() || Date.now() - t0 > ms) { clearInterval(iv); res(this.up()); } }, 120); });
+  },
+};
+function onBusChange() {
+  $('#netDot').classList.toggle('on', Bus.up());
+  $('#netDot').title = Bus.up() ? 'Conectat' : 'Se conectează…';
+  if (S.view === 'game') { renderTurn(); if (Bus.up()) { scheduleHeal(); ping(); } }
+}
+async function onMessage(topic, payload, bi) {
+  const room = S.room;
+  if (!room || !topic.startsWith(room.topic + '/')) return;
+  const sub = topic.slice(room.topic.length + 1);
+  const str = payload && payload.length ? td.decode(payload) : '';
+  if (sub.startsWith('p/')) {
+    const pid = sub.slice(2);
+    if (!ID_RE.test(pid)) return;
+    if (!str) { if (S.room === room) setPic(pid, ''); return; }
+    try { const d = await unseal(room, str); if (S.room === room) setPic(pid, d && validPic(d.img) ? d.img : ''); } catch {}
+    return;
+  }
+  if (!str) return;
+  let d;
+  try { d = await unseal(room, str); } catch { return; }
+  if (S.room !== room) return;
+  if (sub === 's') onState(d, bi);
+  else if (sub === 'h' && d && typeof d.pid === 'string' && ID_RE.test(d.pid)) {
+    const was = isOnline(d.pid);
+    S.seenAt.set(d.pid, Date.now());
+    if (!was) renderPlayers();
+  }
+}
+function onState(raw, bi) {
+  if (!validGame(raw) || raw.code !== S.code) return;
+  const g = clean(raw);
+  if (bi >= 0 && (!S.brokerBest[bi] || cmp(g, S.brokerBest[bi]) > 0)) S.brokerBest[bi] = g;
+  if (!S.game || cmp(g, S.game) > 0) ingest(g);
+  scheduleHeal();
+}
+async function publishState(g, only) {
+  const room = S.room; if (!room) return;
+  Bus.pub(room.topic + '/s', await seal(room, g), true, only);
+}
+// If a broker still holds an older version (it missed a message, or two writes crossed), give it the newest one.
+function scheduleHeal() { clearTimeout(S.healT); S.healT = setTimeout(heal, 900 + rnd(1600)); }
+function heal() {
+  const g = S.game;
+  if (!g || g.local || !S.room) return;
+  for (const b of Bus.clients) {
+    const best = S.brokerBest[b.i];
+    // A broker that has sent nothing yet may simply be slow to deliver its copy; give it a few seconds first.
+    if (b.up && (best ? cmp(best, g) < 0 : Date.now() - b.connAt > 4000)) publishState(g, b.i);
+  }
+}
+async function ping() {
+  const room = S.room;
+  if (!room || isLocal() || document.hidden || !Bus.up()) return;
+  S.seenAt.set(S.pid, Date.now());
+  Bus.pub(room.topic + '/h', await seal(room, { pid: S.pid, at: Date.now() }), false);
+}
+const isOnline = id => id === S.pid || Date.now() - (S.seenAt.get(id) || 0) < 40000;
+
+/* ---------- writes: the player who acts writes the next version ---------- */
+const chains = {};
+function mutate(code, fn, check) {
+  const run = async () => {
+    if (code === 'LOCAL') {
+      const next = fn(S.localGame ? clean(S.localGame) : null);
+      if (!next) return null;
+      next.updatedAt = Date.now();
+      S.localGame = next; lsSet('local', next);
+      queueMicrotask(() => { if (S.code === 'LOCAL') ingest(clean(next)); });
+      return next;
+    }
+    for (let i = 0; i < 4; i++) {
+      if (S.code !== code || !S.room) throw { code: 'gone' };
+      if (!Bus.up() && !(await Bus.ready(6000))) throw { code: 'offline' };
+      const base = S.game ? clean(S.game) : null;
+      const next = fn(base ? clean(base) : null);
+      if (!next) return null;
+      next.rev = (base ? base.rev : 0) + 1;
+      next.wid = S.pid + '.' + rid();
+      next.updatedAt = Date.now();
+      const room = S.room;
+      await publishState(next);
+      if (S.room === room) onState(next, -1);
+      if (!check) return next;
+      await sleep(1400);
+      if (S.code !== code) return null;
+      if (S.game && check(S.game)) return S.game;
+    }
+    throw { code: 'busy' };
+  };
+  const p = (chains[code] || Promise.resolve()).then(run, run);
+  chains[code] = p.catch(() => {});
+  return p;
+}
+function writeError(e) {
+  const c = e && e.code;
+  if (c === 'gone') return;
+  if (c === 'offline') toast('Nu ești conectat la internet. Încearcă din nou când revine semnalul.');
+  else if (c === 'busy') toast('Altcineva a mutat în același timp. Mai încearcă o dată.');
+  else toast('Ceva n-a mers. Mai încearcă o dată.');
+}
+
+/* ---------- pawn drawing ---------- */
+let clipN = 0;
+function tokenInner(ci, pic) {
+  const c = COLORS[ci] || COLORS[0];
+  if (pic) {
+    const id = 'pc' + (++clipN);
+    return `<g fill="${c.f}" stroke="${c.s}" stroke-width="1.7" stroke-linejoin="round"><ellipse cx="0" cy="-4.5" rx="15" ry="6"/><path d="M-5.5-6L-3.2-24h6.4L5.5-6Z"/><circle cx="0" cy="-46" r="23"/></g>`
+      + `<clipPath id="${id}"><circle cx="0" cy="-46" r="18.5"/></clipPath>`
+      + `<image href="${esc(pic)}" x="-18.5" y="-64.5" width="37" height="37" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>`
+      + `<circle cx="0" cy="-46" r="18.5" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>`;
+  }
+  return `<g fill="${c.f}" stroke="${c.s}" stroke-width="1.7" stroke-linejoin="round"><ellipse cx="0" cy="-4.5" rx="15" ry="6"/><path d="M-12-5.5C-10-16-6.2-24-5.2-31.5h10.4C6.2-24 10-16 12-5.5Z"/><ellipse cx="0" cy="-31.5" rx="8.5" ry="3.2"/><circle cx="0" cy="-41.5" r="10"/></g>`
+    + `<ellipse cx="-3.8" cy="-45" rx="3.6" ry="2.4" fill="#FFFFFF" opacity=".65"/><path d="M-6.8-10C-5.8-17-3.8-23-2.8-28" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".35"/>`;
+}
+function tokenSVG(ci, pic, h) {
+  const vb = pic ? [-26, -72, 52, 77] : [-18, -54, 36, 58];
+  return `<svg class="mp" viewBox="${vb.join(' ')}" width="${(h * vb[2] / vb[3]).toFixed(1)}" height="${h}" aria-hidden="true">${tokenInner(ci, pic)}</svg>`;
+}
+const miniPawn = (ci, h) => tokenSVG(ci, '', h);
+function avatar(ci, pic, size) {
+  if (!pic) return miniPawn(ci, size);
+  return `<span class="ava" style="--pc:${(COLORS[ci] || COLORS[0]).f};width:${size}px;height:${size}px"><img src="${esc(pic)}" alt=""></span>`;
+}
+function picOf(p, g) {
+  if (g && g.local) return p.pic || '';
+  return S.pics.get(p.id) || (p.id === S.pid ? S.prefs.pic : '') || '';
+}
+
+/* ---------- board: pawns and effects ---------- */
+const pawnEl = id => [...$('#pawns').children].find(e => e.dataset.id === id);
+function place(el, x, y, s) {
+  el.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s.toFixed(3)})`);
+  S.pp[el.dataset.id] = { x, y, s };
+}
+function ensurePawns(g) {
+  const layer = $('#pawns');
+  const want = new Map(g.players.map(p => [p.id, p]));
+  const keyOf = p => { const pic = picOf(p, g); return `${p.color}|${p.name}|${pic ? pic.length + pic.slice(-24) : '-'}`; };
+  for (const el of [...layer.children]) {
+    const p = want.get(el.dataset.id);
+    if (!p) { el.remove(); continue; }
+    if (el.dataset.k !== keyOf(p) && !(S.animating && el.dataset.id === S.animWho)) el.remove();
+  }
+  for (const p of g.players) {
+    if (pawnEl(p.id)) continue;
+    const el = document.createElementNS(NS, 'g');
+    el.setAttribute('class', 'pawn');
+    el.dataset.id = p.id; el.dataset.k = keyOf(p);
+    el.innerHTML = `<title>${esc(p.name)}</title><g class="rings"><ellipse class="ring-out" cx="0" cy="-1" rx="22" ry="8"/><ellipse class="ring-in" cx="0" cy="-1" rx="22" ry="8"/></g><ellipse cx="0" cy="0.5" rx="16.5" ry="5.5" fill="#000000" opacity=".38"/>${tokenInner(p.color, picOf(p, g))}`;
+    layer.appendChild(el);
+    const at = S.pp[p.id];
+    if (at) place(el, at.x, at.y, at.s);
+  }
+}
+function cluster(k) {
+  if (k <= 1) return [{ dx: 0, dy: 22, s: 1.2 }];
+  const rows = k <= 3 ? 1 : 2, per = Math.ceil(k / rows);
+  const s = k === 2 ? 1.02 : k === 3 ? 0.9 : k <= 6 ? 0.8 : 0.68;
+  const span = k === 2 ? 40 : 68, out = [];
+  for (let i = 0; i < k; i++) {
+    const r = rows === 1 ? 0 : Math.floor(i / per);
+    const inRow = r < rows - 1 ? per : k - per * (rows - 1), c = i - r * per;
+    out.push({ dx: inRow === 1 ? 0 : -span / 2 + span * c / (inRow - 1), dy: rows === 1 ? 22 : (r === 0 ? 6 : 32), s });
+  }
+  return out;
+}
+function layoutPawns(hold) {
+  const g = S.game;
+  if (!g) { $('#pawns').replaceChildren(); return; }
+  ensurePawns(g);
+  const groups = new Map();
+  for (const p of g.players) {
+    const pos = hold && hold.has(p.id) ? hold.get(p.id) : p.pos;
+    S.shown[p.id] = pos;
+    if (pos > 0) { if (!groups.has(pos)) groups.set(pos, []); groups.get(pos).push(p.id); }
+  }
+  g.players.forEach((p, i) => {
+    const el = pawnEl(p.id); if (!el) return;
+    const pos = S.shown[p.id];
+    if (pos <= 0) { const s = startXY(i); place(el, s.x, s.y, 1.05); return; }
+    const ids = groups.get(pos), o = cluster(ids.length)[ids.indexOf(p.id)], c = cellXY(pos);
+    place(el, c.x + o.dx, c.y + o.dy, o.s);
+  });
+  const layer = $('#pawns');
+  const cur = g.status === 'playing' && !S.animating ? curP(g) : null;
+  const els = [...layer.children].sort((a, b) => (S.pp[a.dataset.id]?.y || 0) - (S.pp[b.dataset.id]?.y || 0));
+  for (const el of els) { el.classList.toggle('is-turn', !!cur && el.dataset.id === cur.id); layer.appendChild(el); }
+  const ce = cur && pawnEl(cur.id);
+  if (ce) layer.appendChild(ce);
+}
+function tween(ms, fn) {
+  return new Promise(res => {
+    if (ms <= 0 || document.hidden) { fn(1); res(); return; }
+    const t0 = performance.now();
+    const step = now => { const t = Math.min(1, (now - t0) / ms); fn(t); if (t < 1) requestAnimationFrame(step); else res(); };
+    requestAnimationFrame(step);
+  });
+}
+const hop = (el, a, b) => tween(REDUCED ? 0 : 175, t => place(el, a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t - Math.sin(Math.PI * t) * 20, a.s + (b.s - a.s) * t));
+const glide = (el, a, b) => tween(REDUCED ? 0 : 780, t => { const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; place(el, a.x + (b.x - a.x) * e, a.y + (b.y - a.y) * e - Math.sin(Math.PI * t) * 28, b.s + Math.sin(Math.PI * t) * .32); });
+const shake = (el, a) => tween(REDUCED ? 0 : 440, t => place(el, a.x + Math.sin(t * Math.PI * 6) * 8 * (1 - t), a.y, a.s));
+function arrowFx(a, b) {
+  const A = cellXY(a), B = cellXY(b), col = ARROW_COLOR[a] || '#FFDD24';
+  const len = Math.hypot(B.x - A.x, B.y - A.y).toFixed(1), ang = (Math.atan2(B.y - A.y, B.x - A.x) * 180 / Math.PI).toFixed(1);
+  const g = document.createElementNS(NS, 'g');
+  const L = `x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${len}"`;
+  g.innerHTML = `<line ${L} stroke="#FFFFFF" stroke-width="22" opacity=".9"/><line ${L} stroke="${col}" stroke-width="12"/><g transform="translate(${B.x.toFixed(1)} ${B.y.toFixed(1)}) rotate(${ang})"><path class="fx-head" d="M12 0L-24-20L-24 20Z" fill="${col}" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round"/></g>`;
+  $('#fx').appendChild(g);
+  for (const ln of g.querySelectorAll('line')) {
+    if (ln.animate && !REDUCED) ln.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 430, fill: 'forwards', easing: 'ease-out' });
+    else ln.setAttribute('stroke-dashoffset', '0');
+  }
+  const head = g.querySelector('.fx-head');
+  if (head.animate && !REDUCED) head.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 300, fill: 'backwards' });
+  return g;
+}
+function fadeFx(g) {
+  if (!g) return;
+  if (!g.animate || REDUCED) { setTimeout(() => g.remove(), 500); return; }
+  g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650, delay: 350, fill: 'forwards' }).finished.then(() => g.remove(), () => g.remove());
+}
+function floatLabel(txt, up, p) {
+  const t = document.createElementNS(NS, 'text');
+  t.setAttribute('class', 'fx-label ' + (up ? 'up' : 'down'));
+  t.setAttribute('x', Math.min(1150, Math.max(110, p.x)).toFixed(1));
+  t.setAttribute('y', Math.max(74, p.y - 30).toFixed(1));
+  t.setAttribute('text-anchor', 'middle');
+  t.textContent = txt;
+  $('#fxTop').appendChild(t);
+  if (!t.animate || REDUCED) { setTimeout(() => t.remove(), 1000); return; }
+  t.animate([{ transform: 'translateY(14px)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1, offset: .2 }, { transform: 'translateY(-38px)', opacity: 0 }], { duration: 1450, easing: 'ease-out' })
+    .finished.then(() => t.remove(), () => t.remove());
+}
+function follow(pt) {
+  if (!S.zoom || !pt) return;
+  const sc = $('#boardScroll'), w = $('#board').getBoundingClientRect().width;
+  sc.scrollLeft = pt.x / 1260 * w - sc.clientWidth / 2;
+}
+
+/* ---------- die ---------- */
+const FACES = { 1: [4], 2: [2, 6], 3: [2, 4, 6], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+function renderDie(n, landed) {
+  const d = $('#die');
+  n = int(n, 1, 6); S.lastDie = n;
+  d.className = 'die face' + n + (S.spinning ? ' rolling' : '');
+  d.innerHTML = Array.from({ length: 9 }, (_, i) => `<i${FACES[n].includes(i) ? ' class="on"' : ''}></i>`).join('');
+  if (landed && !REDUCED) { void d.offsetWidth; d.classList.add('landed'); }
+}
+function spinDie(on) {
+  const d = $('#die');
+  if (on) {
+    if (S.spinning) return;
+    S.spinning = true; S.spinT = performance.now(); d.classList.add('rolling');
+    S.spinTimer = setInterval(() => renderDie(1 + rnd(6)), 90);
+  } else {
+    if (!S.spinning) return;
+    S.spinning = false; clearInterval(S.spinTimer); d.classList.remove('rolling');
+  }
+}
+async function landDie(r) {
+  spinDie(true);
+  await sleep(Math.max(0, (REDUCED ? 0 : 640) - (performance.now() - S.spinT)));
+  spinDie(false); renderDie(r, true);
+  await sleep(REDUCED ? 0 : 240);
+}
+
+/* ---------- game flow ---------- */
+const curP = g => (g ? g.players[g.turn] : null);
+const isLocal = () => S.code === 'LOCAL';
+const meIn = g => !!g && (g.local || g.players.some(p => p.id === S.pid));
+const myTurn = g => !!g && g.status === 'playing' && !!curP(g) && (g.local || curP(g).id === S.pid);
+const canRoll = () => myTurn(S.game) && !S.animating && !S.pendingRoll;
+const myName = () => cleanName(S.prefs.name);
+
+function ingest(g) {
+  if (S.game && S.game.code === g.code && cmp(g, S.game) <= 0) return;
+  S.game = g; S.missing = false;
+  const L = g.last;
+  if (S.firstSnap) {
+    S.firstSnap = false;
+    if (L) { S.seen.add(L.rid); renderDie(L.r); }
+    if (g.status === 'done') S.celebrated.add(g.code + (L ? L.rid : ''));
+  } else if (L && !S.seen.has(L.rid)) { S.seen.add(L.rid); S.queue.push(L); }
+  if (!g.local) rememberGame(g);
+  if (!S.animating) { if (S.queue.length) runQueue(); else layoutPawns(); }
+  renderGame();
+}
+async function runQueue() {
+  const gen = S.gen;
+  S.animating = true;
+  if (document.hidden) S.queue.length = 0;
+  else if (S.queue.length > 2) S.queue.splice(0, S.queue.length - 1);
+  while (S.queue.length && gen === S.gen) {
+    const L = S.queue.shift();
+    const hold = new Map([[L.by, L.f]]);
+    for (const q of S.queue) if (!hold.has(q.by)) hold.set(q.by, S.shown[q.by] ?? q.f);
+    S.animText = `${L.n} a dat ${L.r}`; S.animWho = L.by; S.animRid = L.rid;
+    layoutPawns(hold);
+    if (L.rid === S.myRid) S.pendingRoll = false;
+    renderGame();
+    try { await animateMove(L, gen); } catch (e) { console.error(e); }
+    S.shown[L.by] = L.t;
+  }
+  if (gen !== S.gen) return;
+  S.animating = false; S.animText = ''; S.animWho = null; S.animRid = null;
+  layoutPawns(); renderGame(); afterSettle();
+}
+async function animateMove(L, gen) {
+  await landDie(L.r);
+  const el = pawnEl(L.by);
+  if (!el || gen !== S.gen) return;
+  el.parentNode.appendChild(el);
+  let at = { ...(S.pp[L.by] || startXY(0)) };
+  const path = pathOf(L);
+  if (!path.length) { await shake(el, at); return; }
+  for (const n of path) {
+    if (gen !== S.gen) return;
+    const c = cellXY(n), to = { x: c.x, y: c.y + 22, s: 1.2 };
+    await hop(el, at, to); at = to; follow(to);
+  }
+  if (L.t !== L.m) {
+    await sleep(REDUCED ? 0 : 170);
+    if (gen !== S.gen) return;
+    const fx = arrowFx(L.m, L.t), c = cellXY(L.t), to = { x: c.x, y: c.y + 22, s: 1.2 };
+    floatLabel(L.t > L.m ? 'SUS!' : 'JOS!', L.t > L.m, cellXY(L.m));
+    await glide(el, at, to); follow(to);
+    fadeFx(fx);
+    await sleep(REDUCED ? 0 : 200);
+  }
+}
+function afterSettle() {
+  const g = S.game; if (!g) return;
+  if (g.status === 'done') {
+    const key = g.code + (g.last ? g.last.rid : '');
+    if (!S.celebrated.has(key)) { S.celebrated.add(key); confetti(); }
+  }
+  if (!g.local && myTurn(g)) {
+    const key = g.code + ':' + g.rev;
+    if (S.buzzed !== key) { S.buzzed = key; try { navigator.vibrate && navigator.vibrate(35); } catch {} }
+  }
+  if (S.zoom && g.status === 'playing') { const c = curP(g); if (c) follow(S.pp[c.id]); }
+}
+function rememberGame(g) {
+  const list = (lsGet('mine') || []).filter(x => x && x.code !== g.code);
+  list.unshift({ code: g.code, at: Date.now(), status: g.status, mine: g.players.some(p => p.id === S.pid), names: g.players.slice(0, 10).map(p => p.name), colors: g.players.slice(0, 10).map(p => p.color) });
+  lsSet('mine', list.slice(0, 12));
+}
+
+/* ---------- actions ---------- */
+const onlineOk = () => { if (window.mqtt && window.crypto && crypto.subtle) return true; toast('Partea online nu s-a încărcat. Verifică internetul și reîncarcă pagina.'); return false; };
+async function createGame() {
+  const name = myName();
+  if (!name) { toast('Scrie-ți întâi porecla.'); $('#prefName').focus(); return; }
+  if (!onlineOk()) return;
+  const code = genCode();
+  await openGame(code, true);
+  if (S.code !== code) return;
+  try {
+    await mutate(code, cur => {
+      if (cur) return null;
+      const now = Date.now();
+      return { v: 1, code, local: false, status: 'lobby', rules: { bounce: true, six: false },
+        players: [{ id: S.pid, name, color: S.prefs.color, pos: 0 }], turn: 0, turnAt: now, rev: 0, wid: '', last: null,
+        log: [{ k: 'create', n: name, c: S.prefs.color, at: now }], winner: null, createdAt: now, updatedAt: now };
+    });
+    pushMyPic();
+  } catch (e) { writeError(e); }
+}
+async function joinGame() {
+  const g = S.game; if (!g) return;
+  const input = $('#joinName');
+  const name = cleanName(input ? input.value : myName());
+  if (!name) { toast('Scrie o poreclă.'); if (input) input.focus(); return; }
+  if (g.local) {
+    const pic = S.localPic, want = S.joinColor;
+    await mutate('LOCAL', cur => {
+      if (!cur || cur.status !== 'lobby' || cur.players.length >= MAXP) return null;
+      const p = { id: 'L' + rid(), name, color: freeColor(cur, want), pos: 0 };
+      if (pic) p.pic = pic;
+      cur.players.push(p); cur.rev++;
+      return cur;
+    });
+    S.localPic = ''; S.joinColor = null;
+    if (input) { input.value = ''; input.focus(); }
+    return;
+  }
+  S.prefs.name = name; savePrefs(); $('#prefName').value = name;
+  const want = S.joinColor ?? S.prefs.color;
+  let full = false;
+  try {
+    await mutate(g.code, cur => {
+      if (!cur || cur.players.some(p => p.id === S.pid)) return null;
+      if (cur.players.length >= MAXP) { full = true; return null; }
+      const color = freeColor(cur, want), now = Date.now();
+      cur.players.push({ id: S.pid, name, color, pos: 0 });
+      cur.log.push({ k: 'join', n: name, c: color, at: now });
+      trimLog(cur);
+      return cur;
+    }, cur => cur.players.some(p => p.id === S.pid));
+    if (full) toast('Partida s-a umplut între timp: 10 jucători.');
+    else pushMyPic();
+  } catch (e) { writeError(e); }
+}
+async function startGame() {
+  const g = S.game; if (!g) return;
+  try {
+    await mutate(g.code, cur => {
+      if (!cur || cur.status !== 'lobby' || !cur.players.length || !meIn(cur)) return null;
+      return begin(cur, 'start');
+    }, cur => cur.status !== 'lobby');
+  } catch (e) { writeError(e); }
+}
+async function rematch() {
+  const g = S.game; if (!g) return;
+  try { await mutate(g.code, cur => (cur && cur.status === 'done' && cur.players.length ? begin(cur, 'rematch') : null), cur => cur.status === 'playing'); }
+  catch (e) { writeError(e); }
+}
+async function setRule(key, val) {
+  const g = S.game; if (!g || !['bounce', 'six'].includes(key)) return;
+  try {
+    await mutate(g.code, cur => { if (!cur || cur.status !== 'lobby') return null; cur.rules[key] = !!val; cur.rev++; return cur; },
+      cur => cur.status !== 'lobby' || cur.rules[key] === !!val);
+  } catch (e) { writeError(e); renderRules(); }
+}
+async function doRoll() {
+  const g = S.game;
+  if (!canRoll()) return;
+  const roller = curP(g).id, lastRid = g.last ? g.last.rid : null, roll = rnd(6) + 1, id = rid();
+  S.pendingRoll = true; S.myRid = id;
+  spinDie(true); renderTurn();
+  try {
+    const res = await mutate(g.code, cur => {
+      if (!cur || (cur.last ? cur.last.rid : null) !== lastRid) return null;
+      return applyRoll(cur, roller, roll, id, Date.now());
+    }, cur => cur.log.some(e => e.k === 'move' && e.rid === id));
+    if (!res) { S.pendingRoll = false; spinDie(false); renderDie(S.lastDie); toast('Între timp s-a mutat altcineva. Uită-te pe tablă.'); renderTurn(); return; }
+    setTimeout(() => { if (S.myRid === id && S.pendingRoll) { S.pendingRoll = false; spinDie(false); renderTurn(); } }, 5000);
+  } catch (e) { S.pendingRoll = false; spinDie(false); renderDie(S.lastDie); writeError(e); renderTurn(); }
+}
+async function skipTurn() {
+  const g = S.game, who = curP(g); if (!who) return;
+  try {
+    await mutate(g.code, cur => {
+      if (!cur || cur.status !== 'playing') return null;
+      const c = curP(cur);
+      if (!c || c.id !== who.id || Date.now() - cur.turnAt < 25000) return null;
+      cur.turn = (cur.turn + 1) % cur.players.length; cur.turnAt = Date.now();
+      cur.log.push({ k: 'skip', n: c.name, c: c.color, at: cur.turnAt });
+      trimLog(cur);
+      return cur;
+    }, cur => !(cur.status === 'playing' && curP(cur) && curP(cur).id === who.id));
+  } catch (e) { writeError(e); }
+}
+async function leaveGame() {
+  const g = S.game; if (!g) return;
+  try {
+    await mutate(g.code, cur => {
+      if (!cur) return null;
+      const i = cur.players.findIndex(p => p.id === S.pid);
+      if (i < 0) return null;
+      const wasTurn = i === cur.turn, [p] = cur.players.splice(i, 1), n = cur.players.length, now = Date.now();
+      if (!n) { if (cur.status === 'playing') cur.status = 'lobby'; cur.turn = 0; }
+      else { if (i < cur.turn) cur.turn--; if (cur.turn >= n) cur.turn = 0; if (wasTurn) cur.turnAt = now; }
+      cur.log.push({ k: 'leave', n: p.name, c: p.color, at: now });
+      trimLog(cur);
+      return cur;
+    }, cur => !cur.players.some(p => p.id === S.pid));
+    lsSet('mine', (lsGet('mine') || []).filter(x => x && x.code !== g.code));
+    goLobby();
+  } catch (e) { writeError(e); }
+}
+function openLocal() {
+  if (!S.localGame) {
+    const now = Date.now(), players = [];
+    if (myName()) { const p = { id: 'L' + rid(), name: myName(), color: S.prefs.color, pos: 0 }; if (S.prefs.pic) p.pic = S.prefs.pic; players.push(p); }
+    S.localGame = { v: 1, code: 'LOCAL', local: true, status: 'lobby', rules: { bounce: true, six: false }, players, turn: 0, turnAt: now, rev: 1, wid: '', last: null, log: [], winner: null, createdAt: now, updatedAt: now };
+    lsSet('local', S.localGame);
+  }
+  enterGame('LOCAL');
+  setHash('LOCAL');
+  ingest(clean(S.localGame));
+}
+function quitLocal() { S.localGame = null; lsSet('local', null); goLobby(); }
+function confirmThen(key, fn) {
+  clearTimeout(S.confirmT);
+  if (S.confirm === key) { S.confirm = null; renderDanger(); fn(); return; }
+  S.confirm = key; renderDanger();
+  S.confirmT = setTimeout(() => { S.confirm = null; renderDanger(); }, 4000);
+}
+function gameLink(code) { return location.origin + location.pathname + '#' + code; }
+function shareGame() {
+  const code = S.code; if (!code || code === 'LOCAL') return;
+  const url = gameLink(code), text = `Hai la Sus-Jos! Codul partidei: ${fmtCode(code)}`;
+  const copy = () => {
+    try { navigator.clipboard.writeText(`${text}\n${url}`).then(() => toast('Am copiat linkul. Trimite-l prietenilor.'), () => toast(`Linkul: ${url}`)); }
+    catch { toast(`Linkul: ${url}`); }
+  };
+  if (navigator.share) navigator.share({ title: 'Sus-Jos', text, url }).catch(err => { if (!err || err.name !== 'AbortError') copy(); });
+  else copy();
+}
+function toggleZoom(force) {
+  S.zoom = typeof force === 'boolean' ? force : !S.zoom;
+  $('#boardScroll').classList.toggle('zoomed', S.zoom);
+  const b = $('#zoomBtn');
+  b.textContent = S.zoom ? 'Micșorează' : 'Mărește tabla';
+  b.setAttribute('aria-pressed', String(S.zoom));
+  if (S.zoom && S.game) {
+    const c = (S.game.status === 'playing' && curP(S.game)) || S.game.players.find(p => p.id === S.pid) || S.game.players[0];
+    if (c) requestAnimationFrame(() => follow(S.pp[c.id]));
+  }
+}
+
+/* ---------- photos on pawns ---------- */
+function loadImg(file) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { res(im); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('decode')); };
+    im.src = url;
+  });
+}
+async function fileToPic(file) {
+  if (!file || (file.type && !/^image\//.test(file.type))) throw new Error('type');
+  let img;
+  try { img = await createImageBitmap(file); } catch { img = await loadImg(file); }
+  const w = img.width, h = img.height, s = Math.min(w, h);
+  if (!s) throw new Error('empty');
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 160;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 160, 160);
+  ctx.drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, 160, 160);
+  const out = cv.toDataURL('image/jpeg', 0.8);
+  if (!validPic(out)) throw new Error('encode');
+  return out;
+}
+function setPic(pid, img) {
+  if ((S.pics.get(pid) || '') === img) return;
+  if (img) S.pics.set(pid, img); else S.pics.delete(pid);
+  if (pid === S.pid && img && img !== S.prefs.pic && !S.prefs.pic) { S.prefs.pic = img; savePrefs(); renderPrefPicker(); }
+  onPicsChanged();
+}
+async function pushMyPic() {
+  const room = S.room, g = S.game;
+  if (!room || isLocal() || !g || !g.players.some(p => p.id === S.pid)) return;
+  const want = S.prefs.pic || '';
+  if ((S.pics.get(S.pid) || '') === want) return;
+  const topic = room.topic + '/p/' + S.pid;
+  Bus.pub(topic, want ? await seal(room, { img: want }) : '', true);
+  if (S.room === room) setPic(S.pid, want);
+}
+function setMyPic(pic) {
+  S.prefs.pic = pic; savePrefs(); renderPrefPicker();
+  if (S.game && !S.game.local) { renderJoin(); pushMyPic(); }
+  toast(pic ? 'Gata, poza e pe pionul tău.' : 'Am scos poza de pe pion.');
+  onPicsChanged();
+}
+function onPicsChanged() {
+  if (S.view === 'game' && S.game) { if (!S.animating) layoutPawns(); else ensurePawns(S.game); renderPlayers(); renderWin(); }
+}
+
+/* ---------- rendering ---------- */
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(S.toastT);
+  S.toastT = setTimeout(() => { t.hidden = true; }, 3600);
+}
+function savePrefs() { lsSet('me', { name: S.prefs.name, color: S.prefs.color, pic: S.prefs.pic }); }
+function picker(sel, taken, attr) {
+  return `<div class="swatches" role="radiogroup" aria-label="Culoarea pionului">${COLORS.map((c, i) => `<button type="button" class="sw" role="radio" aria-checked="${i === sel}" aria-label="${c.n}" title="${c.n}" data-${attr}="${i}"${taken && taken.has(i) ? ' disabled' : ''}>${miniPawn(i, 32)}</button>`).join('')}</div>`;
+}
+function renderPrefPicker() {
+  $('#prefPicker').innerHTML = picker(S.prefs.color, null, 'pc');
+  $('#pcLabel').textContent = 'Culoarea pionului: ' + COLORS[S.prefs.color].n.toLowerCase();
+  $('#prefPicPrev').innerHTML = tokenSVG(S.prefs.color, S.prefs.pic, 62);
+  $('#prefPicClear').hidden = !S.prefs.pic;
+}
+function renderLegend() {
+  const chips = list => list.map(([a, b]) => `<span class="leg">${a} → ${b}</span>`).join('');
+  $('#legend').innerHTML = `<div class="legend-group up"><b>Urcă</b><div class="legend">${chips(ARROWS.filter(x => x[1] > x[0]))}</div></div>`
+    + `<div class="legend-group down"><b>Coboară</b><div class="legend">${chips(ARROWS.filter(x => x[1] < x[0]))}</div></div>`;
+}
+function renderConn() {
+  const n = $('#connNote');
+  const ok = !!(window.mqtt && window.crypto && crypto.subtle);
+  n.hidden = ok;
+  n.textContent = ok ? '' : 'Partea online nu s-a încărcat. Verifică internetul și reîncarcă pagina. „Joc pe un telefon” merge oricum.';
+}
+function renderList() {
+  const box = $('#gameList');
+  const cutoff = Date.now() - 14 * 864e5;
+  const list = (lsGet('mine') || []).filter(x => x && /^[A-Z2-9]{8}$/.test(x.code) && x.at > cutoff);
+  const local = S.localGame;
+  let html = '';
+  if (local && local.players.length) {
+    html += `<button type="button" class="grow" data-open="LOCAL"><span class="gcode">TELEFON</span><span class="gmeta"><span class="gtop"><span class="chip st-${local.status}">${{ lobby: 'Se așteaptă', playing: 'În joc', done: 'Terminată' }[local.status]}</span></span><span class="gnames">${esc(local.players.map(p => p.name).join(', '))}</span></span><span class="gright"><span class="gcount">${local.players.length}/${MAXP}</span></span></button>`;
+  }
+  const ST = { lobby: ['st-lobby', 'Se așteaptă'], playing: ['st-playing', 'În joc'], done: ['st-done', 'Terminată'] };
+  html += list.map(g => {
+    const st = ST[g.status] || ST.lobby, names = (g.names || []).map(cleanName);
+    const shown = names.slice(0, 4).join(', ') + (names.length > 4 ? ` +${names.length - 4}` : '');
+    return `<button type="button" class="grow" data-open="${esc(g.code)}"><span class="gcode">${esc(fmtCode(g.code))}</span>`
+      + `<span class="gmeta"><span class="gtop"><span class="chip ${st[0]}">${st[1]}</span></span>`
+      + `<span class="gnames">${names.length ? esc(shown) : 'niciun jucător'}</span></span>`
+      + `<span class="gright"><span class="gdots">${(g.colors || []).map(c => miniPawn(int(c, 0, 9), 22)).join('')}</span><span class="gcount">${names.length}/${MAXP}</span></span></button>`;
+  }).join('');
+  box.innerHTML = html || '<p class="empty">Aici apar partidele în care intri de pe telefonul ăsta. Apasă „Partidă nouă” și trimite linkul prietenilor.</p>';
+}
+function renderHeader() {
+  const inGame = S.view === 'game';
+  document.body.classList.toggle('in-game', inGame);
+  $('#backBtn').hidden = !inGame;
+  $('#codeChip').hidden = !inGame || isLocal();
+  if (inGame && !isLocal()) $('#codeTxt').textContent = fmtCode(S.code);
+  $('#netDot').classList.toggle('on', Bus.up());
+}
+function moveHTML(e) {
+  const who = `<b>${esc(e.n)}</b>`;
+  if (!e.b && e.m === e.f) return `${who} a dat ${e.r}, dar îi trebuia exact ${LAST - e.f}. Rămâne pe ${e.f}.`;
+  let s = `${who} a dat ${e.r}: ` + (e.b ? `ajunge la 120 și se întoarce la ${e.m}` : `${e.f || 'START'} → ${e.m}`);
+  if (e.t !== e.m) s += e.t > e.m ? `, <span class="up">urcă la ${e.t}</span>` : `, <span class="down">coboară la ${e.t}</span>`;
+  return s + (e.t === LAST ? '. <span class="up">A câștigat!</span>' : '.');
+}
+function logHTML(e) {
+  const n = `<b>${esc(e.n || 'Cineva')}</b>`, order = (e.o || []).map(esc).join(', ');
+  switch (e.k) {
+    case 'move': return moveHTML(e);
+    case 'create': return `${n} a făcut partida.`;
+    case 'join': return `${n} a intrat în joc.`;
+    case 'leave': return `${n} a ieșit din joc.`;
+    case 'skip': return `S-a sărit peste ${n}.`;
+    case 'start': return `Începe jocul! Ordinea: ${order}.`;
+    case 'rematch': return `Partidă nouă! Ordinea: ${order}.`;
+    default: return '';
+  }
+}
+function renderTurn() {
+  const g = S.game;
+  let m = '', s = '', a = '', mine = false;
+  if (!g) {
+    if (S.missing) {
+      m = 'Nu găsesc partida';
+      s = `Verifică codul ${esc(fmtCode(S.code))}. Dacă e bun, poate partida e prea veche și a fost ștearsă de pe server.`;
+      a = '<button class="btn" type="button" data-act="back">Înapoi</button>';
+    } else m = Bus.up() ? 'Se încarcă partida…' : 'Se conectează…';
+  } else {
+    const cur = curP(g), inG = meIn(g), n = g.players.length;
+    if (S.animating) {
+      m = esc(S.animText) + '…';
+      if (inG && g.status === 'playing') a = '<button class="btn primary roll" type="button" data-act="roll" disabled>Aruncă zarul</button>';
+    } else if (g.status === 'lobby') {
+      m = n ? `Așteptăm jucătorii · ${n}/${MAXP}` : 'Așteptăm jucătorii';
+      s = g.local ? 'Adaugă jucătorii mai jos, apoi apasă „Începe jocul”. Ordinea se trage la sorți.'
+        : `Apasă „Trimite” sus și dă-le prietenilor linkul, sau spune-le codul <b class="code-inline">${esc(fmtCode(g.code))}</b>. Când sunteți toți, apăsați „Începe jocul”.`;
+      if (inG) a = `<button class="btn primary" type="button" data-act="start"${n ? '' : ' disabled'}>Începe jocul</button>`;
+    } else if (g.status === 'playing') {
+      mine = myTurn(g);
+      m = !g.local && mine ? 'Rândul tău!' : `Acum aruncă ${esc(cur.name)}`;
+      s = g.last ? moveHTML(g.last) : `Primul aruncă ${esc(cur.name)}.`;
+      if (inG) {
+        a = `<button class="btn primary roll" type="button" data-act="roll"${canRoll() ? '' : ' disabled'}>Aruncă zarul</button>`;
+        if (!g.local && !mine && Date.now() - g.turnAt > 30000) a += `<button class="btn ghost small" type="button" data-act="skip">Sari peste ${esc(cur.name)}</button>`;
+      } else if (n >= MAXP) s += ' Partida e plină.';
+    } else {
+      const w = g.players.find(p => p.id === g.winner);
+      m = w ? (!g.local && w.id === S.pid ? 'Ai câștigat!' : `${esc(w.name)} a câștigat!`) : 'Partidă terminată';
+      s = g.last ? moveHTML(g.last) : '';
+      if (inG) a = '<button class="btn primary" type="button" data-act="rematch">Încă o partidă</button>';
+    }
+    if (!g.local && !Bus.up()) s += (s ? ' ' : '') + '<span class="warn">Nu e conexiune. Încerc din nou…</span>';
+  }
+  $('#turnMain').innerHTML = m;
+  $('#turnSub').innerHTML = s;
+  const act = $('#turnActions');
+  if (S.lastAct !== a) { act.innerHTML = a; S.lastAct = a; }
+  act.hidden = !a;
+  $('#turnbar').classList.toggle('mine', mine && !!g && !g.local && !S.animating);
+}
+function renderJoin() {
+  const box = $('#joinCard'), g = S.game;
+  const show = !!g && g.players.length < MAXP && (g.local ? g.status === 'lobby' : !meIn(g));
+  box.hidden = !show;
+  if (!show) return;
+  const taken = new Set(g.players.map(p => p.color));
+  if (S.joinColor == null || taken.has(S.joinColor)) S.joinColor = freeColor(g, g.local ? null : S.prefs.color);
+  const key = (g.local ? 'L' : 'O') + g.code;
+  if (box.dataset.key !== key) {
+    box.dataset.key = key;
+    box.innerHTML = `<h3>${g.local ? 'Adaugă jucători' : 'Vrei să joci?'}</h3>`
+      + (g.local ? '<p class="muted small" style="margin:-4px 0 12px">Toți joacă pe telefonul ăsta, pe rând. Adaugă câte un jucător odată.</p>' : '')
+      + `<div class="join-grid"><div><label class="field"><span>Porecla</span><input id="joinName" maxlength="14" autocomplete="off" placeholder="ex. Ana"></label>`
+      + `<div class="field"><span>Poza de pe pion (dacă vrei)</span><div class="picrow"><span class="pic-prev" id="joinPicPrev"></span><span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="${g.local ? 'join' : 'me'}">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearJoinPic" id="joinPicClear">Scoate poza</button></span></div></div></div>`
+      + `<div class="field"><span>Pionul</span><div id="joinPicker"></div></div></div>`
+      + `<button class="btn primary" type="button" data-act="join">${g.local ? 'Adaugă jucătorul' : 'Intră în joc'}</button>`;
+    if (!g.local) $('#joinName').value = S.prefs.name || '';
+  }
+  const pic = g.local ? S.localPic : S.prefs.pic;
+  $('#joinPicker').innerHTML = picker(S.joinColor, taken, 'jc');
+  $('#joinPicPrev').innerHTML = tokenSVG(S.joinColor, pic, 62);
+  $('#joinPicClear').hidden = !pic;
+}
+function renderPlayers() {
+  const g = S.game, box = $('#playersCard');
+  if (!g) { box.innerHTML = ''; return; }
+  const cur = g.status === 'playing' && !S.animating ? curP(g) : null;
+  const rows = g.players.map(p => {
+    const pos = S.shown[p.id] ?? p.pos, on = !g.local && isOnline(p.id);
+    return `<li class="pl${cur && cur.id === p.id ? ' is-turn' : ''}"><span class="chipbg">${avatar(p.color, picOf(p, g), 34)}${g.local ? '' : `<i class="dot${on ? ' on' : ''}" title="${on ? 'e aici acum' : 'nu e aici acum'}"></i>`}</span>`
+      + `<span class="pl-mid"><span class="pl-name">${esc(p.name)}${!g.local && p.id === S.pid ? ' <em>(tu)</em>' : ''}${g.winner === p.id ? '<span class="chip st-win">câștigător</span>' : ''}</span>`
+      + `<span class="bar"><span style="width:${(pos / LAST * 100).toFixed(1)}%;background:${COLORS[p.color].f}"></span></span></span>`
+      + `<span class="pl-pos">${pos > 0 ? `<b>${pos}</b>` : 'START'}</span></li>`;
+  }).join('');
+  const mine = !g.local && meIn(g);
+  box.innerHTML = `<h3>Jucători <span class="count">${g.players.length}/${MAXP}</span></h3>`
+    + (rows ? `<ol class="players">${rows}</ol>` : '<p class="empty">Încă nu a intrat nimeni.</p>')
+    + (mine ? `<div class="mypic"><button class="btn ghost small" type="button" data-act="pickPic" data-for="me">${S.prefs.pic ? 'Schimbă poza de pe pion' : 'Pune o poză pe pion'}</button></div>` : '');
+}
+function renderLog() {
+  const g = S.game, box = $('#logCard');
+  if (!g) { box.innerHTML = ''; return; }
+  const hidden = new Set(S.queue.map(q => q.rid));
+  if (S.animRid) hidden.add(S.animRid);
+  const items = g.log.filter(e => !(e.k === 'move' && hidden.has(e.rid))).slice(-30).reverse();
+  box.innerHTML = '<h3>Ce s-a întâmplat</h3>' + (items.length
+    ? `<ol class="log">${items.map(e => `<li>${e.c != null ? miniPawn(e.c, 18) : '<span></span>'}<span>${logHTML(e)}</span></li>`).join('')}</ol>`
+    : '<p class="empty">Nimic încă.</p>');
+}
+function renderRules() {
+  const g = S.game, box = $('#rulesCard');
+  if (!g) { box.innerHTML = ''; return; }
+  const can = g.status === 'lobby' && meIn(g);
+  box.innerHTML = '<h3>Reguli</h3>'
+    + `<label class="toggle"><input type="checkbox" data-rule="bounce"${g.rules.bounce ? ' checked' : ''}${can ? '' : ' disabled'}><span><b>Ricoșeu la 120</b><small>${g.rules.bounce ? 'Dacă dai mai mult decât îți trebuie, te întorci înapoi cu pașii în plus.' : 'Dacă dai mai mult decât îți trebuie, rămâi pe loc.'}</small></span></label>`
+    + `<label class="toggle"><input type="checkbox" data-rule="six"${g.rules.six ? ' checked' : ''}${can ? '' : ' disabled'}><span><b>La 6 mai arunci o dată</b><small>${g.rules.six ? 'Pornit.' : 'Oprit: fiecare aruncă o singură dată pe tură.'}</small></span></label>`
+    + (g.status === 'lobby' ? '' : '<p class="muted small" style="margin:6px 0 0">Regulile se pot schimba doar înainte de start.</p>');
+}
+function renderDanger() {
+  const g = S.game, box = $('#dangerCard');
+  const btn = (act, label) => `<button type="button" class="btn danger small" data-act="${act}">${label}</button>`;
+  const parts = [];
+  if (g) {
+    if (g.local) parts.push(btn('quitLocal', S.confirm === 'quitLocal' ? 'Sigur? Apasă din nou' : 'Închide partida de pe telefon'));
+    else if (meIn(g)) parts.push(btn('leave', S.confirm === 'leave' ? 'Sigur ieși? Apasă din nou' : 'Ieși din partidă'));
+  }
+  box.hidden = !parts.length;
+  box.innerHTML = parts.join('');
+}
+function renderWin() {
+  const g = S.game, b = $('#winBanner');
+  const w = g && g.status === 'done' && !S.animating ? g.players.find(p => p.id === g.winner) : null;
+  b.hidden = !w;
+  if (w) b.innerHTML = `${avatar(w.color, picOf(w, g), 30)}<span>${esc(w.name)} a câștigat!</span>`;
+}
+function renderGame() {
+  if (S.view !== 'game') return;
+  renderHeader(); renderTurn(); renderJoin(); renderPlayers(); renderLog(); renderRules(); renderDanger(); renderWin();
+}
+function confetti() {
+  if (REDUCED) return;
+  const cv = $('#confetti'), r = cv.parentElement.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+  cv.width = r.width * dpr; cv.height = r.height * dpr; cv.hidden = false;
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const parts = Array.from({ length: 150 }, () => ({ x: r.width / 2 + (Math.random() - .5) * r.width * .35, y: r.height * .4, vx: (Math.random() - .5) * 10, vy: -Math.random() * 10 - 3, s: 5 + Math.random() * 5, c: COLORS[rnd(9)].f, a: Math.random() * 6, va: (Math.random() - .5) * .3 }));
+  const t0 = performance.now();
+  const tick = now => {
+    const t = now - t0;
+    ctx.clearRect(0, 0, r.width, r.height);
+    for (const p of parts) {
+      p.vy += .24; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.globalAlpha = Math.max(0, 1 - t / 2800);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .66); ctx.restore();
+    }
+    if (t < 2800) requestAnimationFrame(tick); else cv.hidden = true;
+  };
+  requestAnimationFrame(tick);
+}
+
+/* ---------- views ---------- */
+function leaveRoom() {
+  if (S.room) { for (const t of ['s', 'p/+', 'h']) Bus.unsub(S.room.topic + '/' + t); }
+  S.room = null; S.brokerBest = {}; S.pics = new Map(); S.seenAt = new Map();
+  clearTimeout(S.missT); clearTimeout(S.healT);
+}
+function setHash(code) {
+  try { history.replaceState(null, '', code ? '#' + code : location.pathname + location.search); } catch {}
+}
+function enterGame(code) {
+  S.gen++;
+  leaveRoom();
+  Object.assign(S, { view: 'game', code, game: null, missing: false, firstSnap: true, queue: [], shown: {}, pp: {}, animating: false, animText: '', animWho: null, animRid: null, pendingRoll: false, joinColor: null, localPic: '', lastAct: null, confirm: null });
+  $('#pawns').replaceChildren(); $('#fx').replaceChildren(); $('#fxTop').replaceChildren();
+  spinDie(false); renderDie(S.lastDie);
+  $('#joinCard').dataset.key = '';
+  $('#vLobby').hidden = true; $('#vGame').hidden = false;
+  window.scrollTo(0, 0);
+  renderGame();
+}
+async function openGame(code, creating) {
+  code = normCode(code);
+  if (code === 'LOCAL') { openLocal(); return; }
+  if (code.length !== 8) { toast('Codul are 8 caractere, de forma XXXX-XXXX.'); return; }
+  if (!onlineOk()) return;
+  if (S.code === code && S.view === 'game' && S.room) return;
+  enterGame(code);
+  setHash(code);
+  const gen = S.gen;
+  Bus.start();
+  const room = await deriveRoom(code);
+  if (gen !== S.gen) return;
+  S.room = room;
+  for (const t of ['s', 'p/+', 'h']) Bus.sub(room.topic + '/' + t);
+  ping();
+  if (!creating) {
+    const check = () => {
+      if (gen !== S.gen || S.game) return;
+      if (Bus.up() && Date.now() - Bus.upSince > 5000) { S.missing = true; renderGame(); }
+      else S.missT = setTimeout(check, 2000);
+    };
+    S.missT = setTimeout(check, 6000);
+  }
+  setTimeout(() => { if (gen === S.gen) pushMyPic(); }, 3500);
+}
+function goLobby() {
+  S.gen++;
+  leaveRoom();
+  Object.assign(S, { view: 'lobby', code: null, game: null, animating: false, queue: [], pendingRoll: false, confirm: null });
+  spinDie(false);
+  $('#vGame').hidden = true; $('#vLobby').hidden = false;
+  setHash('');
+  renderHeader(); renderList();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-open],[data-pc],[data-jc]');
+  if (!t || t.disabled) return;
+  if (t.dataset.open) { openGame(t.dataset.open); return; }
+  if (t.dataset.pc != null) { S.prefs.color = int(t.dataset.pc, 0, 9); savePrefs(); renderPrefPicker(); return; }
+  if (t.dataset.jc != null) { S.joinColor = int(t.dataset.jc, 0, 9); renderJoin(); return; }
+  const acts = {
+    create: createGame, back: goLobby, share: shareGame, roll: doRoll, start: startGame, join: joinGame, skip: skipTurn,
+    rematch, zoom: () => toggleZoom(), local: openLocal,
+    leave: () => confirmThen('leave', leaveGame), quitLocal: () => confirmThen('quitLocal', quitLocal),
+    pickPic: () => { S.picFor = t.dataset.for || 'me'; $('#picInput').click(); },
+    clearPic: () => setMyPic(''),
+    clearJoinPic: () => { if (S.game && S.game.local) { S.localPic = ''; renderJoin(); } else setMyPic(''); },
+  };
+  const fn = acts[t.dataset.act];
+  if (fn) fn();
+});
+document.addEventListener('change', e => {
+  const r = e.target.closest('[data-rule]');
+  if (r) setRule(r.dataset.rule, r.checked);
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'prefName' || (e.target.id === 'joinName' && !isLocal())) {
+    S.prefs.name = e.target.value.slice(0, 14);
+    clearTimeout(S.nameT); S.nameT = setTimeout(savePrefs, 300);
+  }
+});
+$('#codeForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const code = normCode($('#codeInput').value);
+  if (code.length !== 8) { toast('Codul are 8 caractere, de forma XXXX-XXXX.'); return; }
+  openGame(code);
+});
+$('#picInput').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  let pic;
+  try { pic = await fileToPic(f); } catch { toast('Nu pot citi poza asta. Încearcă alta (JPG sau PNG).'); return; }
+  if (S.picFor === 'join' && S.game && S.game.local) { S.localPic = pic; renderJoin(); return; }
+  setMyPic(pic);
+});
+window.addEventListener('hashchange', () => {
+  const h = normCode(location.hash.slice(1));
+  if (h && h !== S.code && (h === 'LOCAL' || h.length === 8)) openGame(h);
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  ping();
+  for (const b of Bus.clients) if (!b.up && !b.c.reconnecting) { try { b.c.reconnect(); } catch {} }
+});
+setInterval(ping, 15000);
+setInterval(() => { if (S.view === 'game' && S.game && !S.animating) { if (S.game.status === 'playing') renderTurn(); if (!S.game.local) renderPlayers(); } }, 8000);
+
+/* ---------- boot ---------- */
+(function boot() {
+  const p = lsGet('me') || {};
+  S.prefs = { name: cleanName(p.name), color: int(p.color, 0, 9), pic: validPic(p.pic) ? p.pic : '' };
+  let pid = lsGet('pid');
+  if (typeof pid !== 'string' || !ID_RE.test(pid)) { pid = 'p' + rid(); lsSet('pid', pid); }
+  S.pid = pid;
+  const lg = lsGet('local');
+  if (lg && validGame(lg) && lg.code === 'LOCAL') S.localGame = clean({ ...lg, local: true });
+  $('#prefName').value = S.prefs.name;
+  renderPrefPicker(); renderLegend(); renderDie(5); renderConn(); renderList(); renderHeader();
+  if (window.mqtt) Bus.start();
+  const h = normCode(location.hash.slice(1));
+  if (h === 'LOCAL') openLocal();
+  else if (h.length === 8) openGame(h);
+})();
+})();
+</script>
+</body>
+</html>
