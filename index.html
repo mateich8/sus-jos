@@ -7,6 +7,12 @@
 <meta name="description" content="Sus-Jos online: tabla de circ cu 120 de căsuțe, zar și săgeți care urcă și coboară. Până la 10 jucători, fără cont.">
 <title>Sus-Jos</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%23FFDD24' stroke='%232B2200' stroke-width='4'/%3E%3Ccircle cx='20' cy='20' r='6' fill='%232B2200'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232B2200'/%3E%3Ccircle cx='44' cy='44' r='6' fill='%232B2200'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sus-Jos">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap">
@@ -40,6 +46,8 @@
   --overlay-ink: #FFFFFF;
   --fx-up: #0F9446;
   --fx-down: #E0262B;
+  --fx-sur: #8B3DCC;
+  --sur: #7E36BE;
   --font-display: "Bungee", "Arial Black", Impact, system-ui, sans-serif;
   --font-body: "Fredoka", "Trebuchet MS", system-ui, -apple-system, "Segoe UI", sans-serif;
   --r: 16px;
@@ -49,7 +57,7 @@
   :root {
     --bg: #0A1510; --surface: #13221A; --surface-2: #182A20; --ink: #E7F1EA; --muted: #97AD9F; --line: #274032;
     --chip: #D8E4DA; --felt: #0D8547; --felt-deep: #08512B; --felt-ink: #FFFFFF; --trim-a: #4E9E5C; --trim-b: #9CD69A;
-    --canary: #FFDA1F; --canary-deep: #D2B000; --canary-ink: #231B00; --up: #45CF82; --down: #FF6B5F; --focus: #86AEFF;
+    --canary: #FFDA1F; --canary-deep: #D2B000; --canary-ink: #231B00; --up: #45CF82; --down: #FF6B5F; --focus: #86AEFF; --sur: #C792FF;
     --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 26px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
@@ -279,6 +287,72 @@ h1, h2, h3 { text-wrap: balance; }
 .end-rule { margin: 4px 0 8px; font-size: 14.5px; color: var(--muted); }
 .end-rule b { color: var(--ink); }
 
+
+/* Accessories, reactions, surprises */
+.acc-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 8px; }
+.sw.acc img { width: 30px; height: 30px; display: block; }
+.acc-none { font-size: 20px; color: var(--muted); }
+.turn-sub .sur, .log .sur { color: var(--sur); font-weight: 600; }
+.fx-label.sur { fill: var(--fx-sur); }
+.chip.st-skip { background: color-mix(in srgb, var(--sur) 16%, transparent); color: var(--sur); margin-left: 4px; }
+.turn-cd { margin: 4px 0 0; font-size: 14px; font-weight: 600; color: var(--down); }
+.turn-cd:empty { display: none; }
+.react-bar { display: flex; flex-direction: column; gap: 8px; }
+.react-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.react-btn { width: 46px; height: 46px; flex: none; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.react-btn img { width: 30px; height: 30px; display: block; }
+.react-btn:active { transform: scale(.9); }
+.phr-btn { margin-left: auto; }
+.phrase-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.phrase { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 13px; font-weight: 600; cursor: pointer; }
+@media (hover: hover) { .react-btn:hover, .phrase:hover { border-color: var(--felt); } }
+.bubble-text { font-family: var(--font-body); font-weight: 600; font-size: 26px; fill: #222222; }
+
+/* 3D die over the board */
+.die3d { --d: clamp(64px, 13vw, 112px); position: absolute; left: 50%; top: 44%; width: var(--d); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2); perspective: 700px; pointer-events: none; z-index: 4; transition: opacity .3s, transform .3s; }
+.die3d.out { opacity: 0; transform: scale(.6); }
+.cube { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.cube.spin { animation: cube-tumble .55s linear infinite; }
+@keyframes cube-tumble { from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); } to { transform: rotateX(360deg) rotateY(720deg) rotateZ(180deg); } }
+.face { position: absolute; inset: 0; background: var(--die-bg); border: 2px solid var(--die-edge); border-radius: 18%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 13%; box-shadow: inset 0 0 14px rgba(0, 0, 0, .16); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.face i { width: 64%; aspect-ratio: 1; border-radius: 50%; place-self: center; }
+.face i.on { background: var(--pip); }
+.face.f1 i.on { background: var(--fx-down); width: 80%; }
+.f1 { transform: translateZ(calc(var(--d) / 2)); }
+.f6 { transform: rotateY(180deg) translateZ(calc(var(--d) / 2)); }
+.f3 { transform: rotateY(90deg) translateZ(calc(var(--d) / 2)); }
+.f4 { transform: rotateY(-90deg) translateZ(calc(var(--d) / 2)); }
+.f2 { transform: rotateX(90deg) translateZ(calc(var(--d) / 2)); }
+.f5 { transform: rotateX(-90deg) translateZ(calc(var(--d) / 2)); }
+
+/* Statistics and standings */
+.highlights { margin: 0 0 12px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; color: var(--muted); }
+.highlights b { color: var(--ink); }
+.highlights .up { color: var(--up); font-weight: 600; }
+.highlights .down { color: var(--down); font-weight: 600; }
+.table-wrap { overflow-x: auto; }
+table.stats { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.stats th { text-align: right; font-weight: 600; color: var(--muted); font-size: 12.5px; padding: 4px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.stats td { text-align: right; padding: 6px; border-bottom: 1px solid var(--line); }
+.stats th:first-child, .stats td:first-child { text-align: left; }
+.stats td:first-child span { font-weight: 600; margin-left: 6px; white-space: nowrap; }
+.stats td:first-child .mp { display: inline-block; vertical-align: middle; }
+.rank { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rank li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 4px 6px; border-radius: 10px; }
+.rank li.lead { background: color-mix(in srgb, var(--canary) 30%, var(--surface)); }
+.rank .chipbg { width: 36px; height: 36px; }
+.rk-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rk-wins { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.rk-wins b { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--ink); }
+
+/* Invite sheet */
+.modal { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .55); display: grid; place-items: center; padding: 16px; }
+.modal-card { background: var(--surface); border-radius: 20px; padding: 20px; width: min(360px, 100%); text-align: center; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.modal-card h3 { margin: 0; font-size: 20px; font-weight: 600; }
+.qr { background: #FFFFFF; border-radius: 14px; padding: 10px; width: min(240px, 70vw); margin: 0 auto; }
+.qr svg { display: block; width: 100%; height: auto; }
+.share-code { margin: 0; font-family: var(--font-display); font-size: 24px; letter-spacing: .08em; color: var(--felt); }
+.modal-card .sp-row { justify-content: center; margin: 0; }
 </style>
 </head>
 <body>
@@ -320,6 +394,7 @@ h1, h2, h3 { text-wrap: balance; }
       <h2>Cine joacă?</h2>
       <label class="field"><span>Porecla ta</span><input id="prefName" maxlength="14" autocomplete="nickname" placeholder="ex. Matei"></label>
       <div class="field"><span id="pcLabel">Culoarea pionului</span><div id="prefPicker"></div></div>
+      <div class="field"><span id="paLabel">Accesoriu</span><div id="prefAcc"></div></div>
       <div class="field"><span>Poza de pe pion (dacă vrei)</span>
         <div class="picrow"><span class="pic-prev" id="prefPicPrev"></span>
           <span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="me">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearPic" id="prefPicClear" hidden>Scoate poza</button></span>
@@ -338,6 +413,10 @@ h1, h2, h3 { text-wrap: balance; }
         <p>Sunteți toți la aceeași masă? Jucați pe rând pe un singur telefon.</p>
         <button class="btn small" type="button" data-act="local">Joc pe un telefon</button>
       </div>
+      <div class="local-row" id="installRow" hidden>
+        <p id="installText"></p>
+        <button class="btn small" type="button" id="installBtn" data-act="install">Instalează</button>
+      </div>
     </div>
 
     <div class="card list">
@@ -350,7 +429,10 @@ h1, h2, h3 { text-wrap: balance; }
       <ol class="howto">
         <li>Toți pornesc de la START. La rândul tău dai cu zarul și muți pionul atâtea căsuțe.</li>
         <li>Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori.</li>
+        <li>Dacă ajungi pe o căsuță unde stă deja cineva, zarul se anulează: te întorci unde erai și trece rândul.</li>
+        <li>Pe tablă sunt ascunse șase căsuțe surpriză: mai arunci o dată, stai o tură sau schimbi locul cu cineva.</li>
         <li>La final ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</li>
+        <li>Dacă nu arunci 30 de secunde, jocul aruncă pentru tine.</li>
       </ol>
       <h3>Săgețile de pe tablă</h3>
       <div id="legend"></div>
@@ -365,6 +447,7 @@ h1, h2, h3 { text-wrap: balance; }
           <svg id="board" viewBox="0 0 1260 898" role="img" aria-label="Tabla de joc cu pionii jucătorilor">
             <rect class="strip" x="0" y="800" width="1260" height="98"/>
             <g id="art"></g>
+            <g id="marks"></g>
             <text class="strip-label" x="30" y="876">START</text>
             <text class="strip-hint" x="1232" y="868" text-anchor="end">la 120 ajungi doar cu zarul exact</text>
             <g id="fx"></g>
@@ -375,27 +458,45 @@ h1, h2, h3 { text-wrap: balance; }
         <button class="zoom-btn" type="button" data-act="zoom" id="zoomBtn" aria-pressed="false">Mărește tabla</button>
         <div class="win" id="winBanner" hidden></div>
         <canvas id="confetti" hidden></canvas>
+        <div class="die3d" id="die3d" hidden aria-hidden="true"><div class="cube" id="cube"></div></div>
       </div>
       <div class="turnbar" id="turnbar">
         <div class="die" id="die" aria-hidden="true"></div>
-        <div class="turn-text"><p class="turn-main" id="turnMain"></p><p class="turn-sub" id="turnSub" aria-live="polite"></p></div>
+        <div class="turn-text"><p class="turn-main" id="turnMain"></p><p class="turn-sub" id="turnSub" aria-live="polite"></p><p class="turn-cd" id="turnCd"></p></div>
         <div class="turn-actions" id="turnActions" hidden></div>
+      </div>
+      <div class="react-bar" id="reactBar" hidden>
+        <div class="react-row"><button class="react-btn" type="button" data-react="0" aria-label="Râs" title="Râs"><img src="img/r-laugh.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="1" aria-label="Foc" title="Foc"><img src="img/r-fire.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="2" aria-label="Plâns" title="Plâns"><img src="img/r-cry.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="3" aria-label="Aplauze" title="Aplauze"><img src="img/r-clap.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="4" aria-label="Șoc" title="Șoc"><img src="img/r-scream.png" alt="" width="30" height="30"></button><button class="react-btn" type="button" data-react="5" aria-label="Inimă" title="Inimă"><img src="img/r-heart.png" alt="" width="30" height="30"></button><button class="btn small phr-btn" type="button" data-act="phrases">Fraze</button></div>
+        <div class="phrase-row" id="phraseRow" hidden><button class="phrase" type="button" data-phrase="0">Haide odată!</button><button class="phrase" type="button" data-phrase="1">Noroc!</button><button class="phrase" type="button" data-phrase="2">Nuuu!</button><button class="phrase" type="button" data-phrase="3">Bravo!</button><button class="phrase" type="button" data-phrase="4">Ce ghinion!</button><button class="phrase" type="button" data-phrase="5">Revanșa!</button><button class="phrase" type="button" data-phrase="6">Te prind!</button><button class="phrase" type="button" data-phrase="7">Pa-pa, 120!</button></div>
       </div>
       <div class="card join" id="joinCard" hidden></div>
     </div>
     <aside class="side">
       <div class="card" id="playersCard"></div>
+      <div class="card" id="statsCard" hidden></div>
+      <div class="card" id="rankCard" hidden></div>
       <div class="card" id="logCard"></div>
       <div class="card" id="rulesCard"></div>
       <div class="quiet" id="dangerCard" hidden></div>
     </aside>
   </section>
 </main>
+<div class="modal" id="shareModal" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="modal-card">
+    <h3 id="shareTitle">Invită prieteni</h3>
+    <p class="muted small" style="margin:0">Cine e lângă tine scanează codul cu camera telefonului. Celorlalți le trimiți linkul.</p>
+    <div class="qr" id="qrBox"></div>
+    <p class="share-code" id="shareCode"></p>
+    <div class="sp-row"><button class="btn primary" type="button" data-act="shareLink">Trimite linkul</button><button class="btn" type="button" data-act="copyLink">Copiază</button></div>
+    <button class="btn ghost small" type="button" data-act="closeShare">Închide</button>
+  </div>
+</div>
 <input type="file" id="picInput" accept="image/*" hidden>
 <input type="file" id="songInput" accept="audio/*" hidden>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script src="lib/qrcode.js"></script>
 <script>
 (() => {
 'use strict';
@@ -406,7 +507,26 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const QS = new URLSearchParams(location.search);
 const DEV = QS.get('dev') === '1';
-const MAXP = 10, LAST = 120;
+const MAXP = 10, LAST = 120, AUTO_MS = 30000;
+// Pawn accessories: hats sit on the head, glasses on the face.
+const ACC = [
+  { n: 'Fără' },
+  { n: 'Coroană', img: 'a-crown', hat: 1, dy: -1, w: 1 },
+  { n: 'Joben', img: 'a-tophat', hat: 1, dy: -5, w: 1.05 },
+  { n: 'Șapcă', img: 'a-cap', hat: 1, dy: 0, w: 1.12 },
+  { n: 'Tocă', img: 'a-grad', hat: 1, dy: -1, w: 1.12 },
+  { n: 'Fundiță', img: 'a-ribbon', hat: 1, dy: 1, w: 0.95 },
+  { n: 'Pălărie', img: 'a-hat', hat: 1, dy: -1, w: 1.2 },
+  { n: 'Cască', img: 'a-helmet', hat: 1, dy: -2, w: 1.08 },
+  { n: 'Ochelari', img: 'a-glasses', hat: 0, dy: 0, w: 1 },
+];
+const REACTIONS = [['r-laugh', 'Râs'], ['r-fire', 'Foc'], ['r-cry', 'Plâns'], ['r-clap', 'Aplauze'], ['r-scream', 'Șoc'], ['r-heart', 'Inimă']];
+const PHRASES = ['Haide odată!', 'Noroc!', 'Nuuu!', 'Bravo!', 'Ce ghinion!', 'Revanșa!', 'Te prind!', 'Pa-pa, 120!'];
+const SURPRISES = {
+  again: { img: 'die', label: 'ÎNCĂ O DATĂ!' },
+  skip: { img: 'zzz', label: 'STAI O TURĂ' },
+  swap: { img: 'shuffle', label: 'SCHIMB DE LOC!' },
+};
 
 const COLORS = [
   { n: 'Roșu', f: '#E3262C', s: '#6E0B10' },
@@ -458,7 +578,8 @@ const S = {
   room: null, brokerBest: {}, pics: new Map(), seenAt: new Map(),
   seen: new Set(), celebrated: new Set(), queue: [], animating: false, animText: '', animWho: null, animRid: null,
   pendingRoll: false, myRid: null, spinning: false, spinT: 0, spinTimer: null, lastDie: 5, force: 0,
-  shown: {}, pp: {}, zoom: false, joinColor: null, localPic: '', picFor: 'me', confirm: null, lastAct: null, buzzed: null,
+  shown: {}, pp: {}, zoom: false, joinColor: null, joinAcc: null, localPic: '', picFor: 'me', confirm: null, lastAct: null, buzzed: null,
+  sent: new Set(), animL: null, animRevealed: false, installEvt: null,
 };
 
 /* ---------- data hygiene ---------- */
@@ -471,7 +592,12 @@ const validGame = d => !!d && typeof d.code === 'string' && /^([A-Z2-9]{8}|LOCAL
 
 function cleanMove(e) {
   if (!e || typeof e !== 'object' || !e.rid) return null;
-  return { rid: String(e.rid).slice(0, 40), by: String(e.by || '').slice(0, 64), n: cleanName(e.n) || 'Cineva', c: int(e.c, 0, 9), r: int(e.r, 1, 6), f: int(e.f, 0, LAST), m: int(e.m, 0, LAST), t: int(e.t, 0, LAST), b: !!e.b, at: num(e.at) };
+  const t = int(e.t, 0, LAST);
+  return {
+    rid: String(e.rid).slice(0, 40), by: String(e.by || '').slice(0, 64), n: cleanName(e.n) || 'Cineva', c: int(e.c, 0, 9), r: int(e.r, 1, 6),
+    f: int(e.f, 0, LAST), m: int(e.m, 0, LAST), j: e.j == null ? t : int(e.j, 0, LAST), t, b: !!e.b, x: !!e.x, s: SURPRISES[e.s] ? e.s : '',
+    sw: typeof e.sw === 'string' && ID_RE.test(e.sw) ? e.sw : '', sn: cleanName(e.sn), so: int(e.so, 0, LAST), a: !!e.a, at: num(e.at),
+  };
 }
 function cleanLog(e) {
   if (!e || typeof e !== 'object') return null;
@@ -482,23 +608,34 @@ function cleanLog(e) {
   if (Array.isArray(e.o)) out.o = e.o.slice(0, MAXP).map(x => cleanName(x) || 'Jucător');
   return out;
 }
+const STAT_KEYS = ['r', 'u', 'd', 'us', 'ds', 'mu', 'md', 's6', 'x', 'su'];
 function clean(d) {
   const local = !!d.local, players = [], ids = new Set();
   for (const p of Array.isArray(d.players) ? d.players : []) {
     if (!p || typeof p.id !== 'string' || !ID_RE.test(p.id) || ids.has(p.id) || players.length >= MAXP) continue;
     ids.add(p.id);
-    const q = { id: p.id, name: cleanName(p.name) || 'Jucător', color: int(p.color, 0, 9), pos: int(p.pos, 0, LAST) };
+    const q = { id: p.id, name: cleanName(p.name) || 'Jucător', color: int(p.color, 0, 9), pos: int(p.pos, 0, LAST), acc: int(p.acc, 0, ACC.length - 1), skip: p.skip ? 1 : 0 };
     if (local && validPic(p.pic)) q.pic = p.pic;
     players.push(q);
   }
   const status = ['lobby', 'playing', 'done'].includes(d.status) ? d.status : 'lobby';
+  const r = d.rules && typeof d.rules === 'object' ? d.rules : {};
+  const stats = {}, wins = {};
+  for (const p of players) {
+    const s = d.stats && d.stats[p.id];
+    if (s && typeof s === 'object') { stats[p.id] = {}; for (const k of STAT_KEYS) stats[p.id][k] = int(s[k], 0, 99999); }
+    const w = d.wins && d.wins[p.id];
+    if (w) wins[p.id] = int(w, 0, 99999);
+  }
+  const sur = (Array.isArray(d.sur) ? d.sur : []).slice(0, 12).filter(x => Array.isArray(x) && SURPRISES[x[1]]).map(x => [int(x[0], 2, 119), x[1], x[2] ? 1 : 0]);
   return {
-    v: 2, code: d.code, local, status,
-    rules: { six: !!(d.rules && d.rules.six) },
+    v: 3, code: d.code, local, status,
+    rules: { six: !!r.six, block: r.block !== false, surprise: r.surprise !== false },
     players, turn: players.length ? int(d.turn, 0, players.length - 1) : 0, turnAt: num(d.turnAt),
     rev: num(d.rev), wid: typeof d.wid === 'string' ? d.wid.slice(0, 96) : '',
     last: cleanMove(d.last), log: (Array.isArray(d.log) ? d.log : []).slice(-60).map(cleanLog).filter(Boolean),
-    winner: typeof d.winner === 'string' ? d.winner : null, createdAt: num(d.createdAt), updatedAt: num(d.updatedAt),
+    winner: typeof d.winner === 'string' ? d.winner : null, stats, wins, sur,
+    createdAt: num(d.createdAt), updatedAt: num(d.updatedAt),
   };
 }
 const trimLog = g => { if (g.log.length > 50) g.log = g.log.slice(-50); };
@@ -506,22 +643,55 @@ const trimLog = g => { if (g.log.length > 50) g.log = g.log.slice(-50); };
 const cmp = (a, b) => (a.rev - b.rev) || (a.wid > b.wid ? 1 : a.wid < b.wid ? -1 : 0);
 
 /* ---------- rules ---------- */
-function applyRoll(g, uid, roll, id, now) {
+function applyRoll(g, uid, roll, id, now, auto = false) {
   if (g.status !== 'playing' || !g.players.length) return null;
   const p = g.players[g.turn];
   if (!p || p.id !== uid) return null;
   const from = p.pos;
   // Near 120 only the exact number (or less) moves you; more than you need and nothing happens.
   const mid = from + roll > LAST ? from : from + roll;
-  const to = mid !== from && JUMP[mid] ? JUMP[mid] : mid;
+  const jump = mid !== from && JUMP[mid] ? JUMP[mid] : mid;
+  const moved = jump !== from;
+  // Landing where someone already stands cancels the roll: back to where you were, and the turn passes.
+  const blocked = moved && g.rules.block && jump !== LAST && g.players.some(q => q !== p && q.pos === jump);
+  let to = blocked ? from : jump, sur = '', partner = null;
+  if (moved && !blocked && g.rules.surprise) {
+    const s = g.sur.find(x => x[0] === jump);
+    if (s) {
+      sur = s[1]; s[2] = 1;
+      if (sur === 'swap') { const others = g.players.filter(q => q !== p && q.pos > 0 && q.pos !== jump); if (others.length) partner = others[rnd(others.length)]; }
+    }
+  }
+  const mv = { rid: id, by: p.id, n: p.name, c: p.color, r: roll, f: from, m: mid, j: jump, t: to, b: false, x: blocked, s: sur, sw: '', sn: '', so: 0, a: !!auto, at: now };
+  if (partner) { mv.sw = partner.id; mv.sn = partner.name; mv.so = partner.pos; to = mv.t = partner.pos; partner.pos = jump; }
   p.pos = to;
-  const mv = { rid: id, by: p.id, n: p.name, c: p.color, r: roll, f: from, m: mid, t: to, b: false, at: now };
+  const st = g.stats[p.id] || (g.stats[p.id] = Object.fromEntries(STAT_KEYS.map(k => [k, 0])));
+  st.r++; if (roll === 6) st.s6++;
+  if (blocked) st.x++;
+  else if (jump > mid) { st.u++; st.us += jump - mid; st.mu = Math.max(st.mu, jump - mid); }
+  else if (jump < mid) { st.d++; st.ds += mid - jump; st.md = Math.max(st.md, mid - jump); }
+  if (sur) st.su++;
   g.last = mv;
   g.log.push({ k: 'move', ...mv });
-  if (to === LAST) { g.status = 'done'; g.winner = p.id; }
-  else if (!(roll === 6 && g.rules.six)) g.turn = (g.turn + 1) % g.players.length;
+  if (to === LAST) { g.status = 'done'; g.winner = p.id; g.wins[p.id] = (g.wins[p.id] || 0) + 1; }
+  else if (blocked) advance(g, now);
+  else if (sur === 'again' || (roll === 6 && g.rules.six)) { /* same player rolls again */ }
+  else { if (sur === 'skip') p.skip = 1; advance(g, now); }
   g.turnAt = now; g.rev++; trimLog(g);
   return g;
+}
+// Next player, passing over anyone who has to sit out a turn.
+function advance(g, now) {
+  const n = g.players.length;
+  let t = g.turn;
+  for (let k = 0; k < n; k++) {
+    t = (t + 1) % n;
+    const q = g.players[t];
+    if (!q.skip) break;
+    q.skip = 0;
+    g.log.push({ k: 'skipped', n: q.name, c: q.color, at: now });
+  }
+  g.turn = t;
 }
 function pathOf(L) {
   const s = [];
@@ -529,11 +699,20 @@ function pathOf(L) {
   else for (let k = L.f + 1; k <= L.m; k++) s.push(k);
   return s;
 }
+// Six hidden surprise squares per round, never on an arrow square.
+function placeSurprises() {
+  const banned = new Set(ARROWS.flatMap(([a, b]) => [a, b]));
+  const pool = [];
+  for (let n = 3; n <= 114; n++) if (!banned.has(n)) pool.push(n);
+  shuffle(pool);
+  return ['again', 'again', 'skip', 'skip', 'swap', 'swap'].map((t, i) => [pool[i], t, 0]);
+}
 function begin(g, kind) {
   const now = Date.now();
   shuffle(g.players);
-  g.players.forEach(p => { p.pos = 0; });
-  g.status = 'playing'; g.turn = 0; g.turnAt = now; g.winner = null; g.last = null;
+  g.players.forEach(p => { p.pos = 0; p.skip = 0; });
+  g.status = 'playing'; g.turn = 0; g.turnAt = now; g.winner = null; g.last = null; g.stats = {};
+  g.sur = g.rules.surprise ? placeSurprises() : [];
   g.log.push({ k: kind, o: g.players.map(p => p.name), at: now });
   trimLog(g); g.rev++;
   return g;
@@ -632,6 +811,12 @@ async function onMessage(topic, payload, bi) {
   try { d = await unseal(room, str); } catch { return; }
   if (S.room !== room) return;
   if (sub === 's') onState(d, bi);
+  else if (sub === 'r' && d && typeof d.pid === 'string' && (d.t === 'e' || d.t === 'p')) {
+    // The same reaction arrives once per broker; show it once.
+    if (typeof d.nonce !== 'string' || S.sent.has(d.nonce)) return;
+    S.sent.add(d.nonce);
+    showReaction(d.pid, d.t, int(d.i, 0, 20));
+  }
   else if (sub === 'h' && d && typeof d.pid === 'string' && ID_RE.test(d.pid)) {
     const was = isOnline(d.pid);
     S.seenAt.set(d.pid, Date.now());
@@ -766,6 +951,7 @@ const Sound = {
       case 'flap': for (let i = 0; i < 6; i++) N(t + i * 0.09, 0.06, { vol: 0.18, freq: 700, q: 1 }); break;
       case 'bonk': T(150, t, 0.2, { type: 'square', to: 85, vol: 0.08 }); T(150, t + 0.22, 0.2, { type: 'square', to: 85, vol: 0.06 }); break;
       case 'turn': T(784, t, 0.14, { type: 'sine', vol: 0.14 }); T(1175, t + 0.12, 0.2, { type: 'sine', vol: 0.14 }); break;
+      case 'react': T(1100, t, 0.07, { type: 'sine', vol: 0.07 }); T(1500, t + 0.05, 0.08, { type: 'sine', vol: 0.06 }); break;
       case 'win': [523, 659, 784].forEach((f, i) => T(f, t + i * 0.13, 0.16, { type: 'square', vol: 0.06 })); [1047, 1319, 1568].forEach(f => T(f, t + 0.42, 0.9, { vol: 0.1 })); break;
     }
   },
@@ -806,25 +992,36 @@ function renderSound() {
 
 /* ---------- pawn drawing ---------- */
 let clipN = 0;
-function tokenInner(ci, pic) {
+function accTag(acc, pic) {
+  const a = ACC[acc];
+  if (!a || !a.img) return '';
+  if (pic) {
+    const w = (a.hat ? 44 : 40) * a.w, y = a.hat ? -76 + a.dy * 1.6 : -47;
+    return `<g transform="translate(0 ${f1(y)})">${imgTag(a.img, f1(w))}</g>`;
+  }
+  const w = (a.hat ? 27 : 21) * a.w, y = a.hat ? -55 + a.dy : -42;
+  return `<g transform="translate(0 ${f1(y)})">${imgTag(a.img, f1(w))}</g>`;
+}
+function tokenInner(ci, pic, acc = 0) {
   const c = COLORS[ci] || COLORS[0];
   if (pic) {
     const id = 'pc' + (++clipN);
     return `<g fill="${c.f}" stroke="${c.s}" stroke-width="1.7" stroke-linejoin="round"><ellipse cx="0" cy="-4.5" rx="15" ry="6"/><path d="M-5.5-6L-3.2-24h6.4L5.5-6Z"/><circle cx="0" cy="-46" r="23"/></g>`
       + `<clipPath id="${id}"><circle cx="0" cy="-46" r="18.5"/></clipPath>`
       + `<image href="${esc(pic)}" x="-18.5" y="-64.5" width="37" height="37" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>`
-      + `<circle cx="0" cy="-46" r="18.5" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>`;
+      + `<circle cx="0" cy="-46" r="18.5" fill="none" stroke="#FFFFFF" stroke-width="2.2"/>` + accTag(acc, pic);
   }
   return `<g fill="${c.f}" stroke="${c.s}" stroke-width="1.7" stroke-linejoin="round"><ellipse cx="0" cy="-4.5" rx="15" ry="6"/><path d="M-12-5.5C-10-16-6.2-24-5.2-31.5h10.4C6.2-24 10-16 12-5.5Z"/><ellipse cx="0" cy="-31.5" rx="8.5" ry="3.2"/><circle cx="0" cy="-41.5" r="10"/></g>`
-    + `<ellipse cx="-3.8" cy="-45" rx="3.6" ry="2.4" fill="#FFFFFF" opacity=".65"/><path d="M-6.8-10C-5.8-17-3.8-23-2.8-28" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".35"/>`;
+    + `<ellipse cx="-3.8" cy="-45" rx="3.6" ry="2.4" fill="#FFFFFF" opacity=".65"/><path d="M-6.8-10C-5.8-17-3.8-23-2.8-28" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".35"/>` + accTag(acc, '');
 }
-function tokenSVG(ci, pic, h) {
-  const vb = pic ? [-26, -72, 52, 77] : [-18, -54, 36, 58];
-  return `<svg class="mp" viewBox="${vb.join(' ')}" width="${(h * vb[2] / vb[3]).toFixed(1)}" height="${h}" aria-hidden="true">${tokenInner(ci, pic)}</svg>`;
+function tokenSVG(ci, pic, h, acc = 0) {
+  const hat = ACC[acc] && ACC[acc].hat;
+  const vb = pic ? (hat ? [-30, -102, 60, 107] : [-26, -72, 52, 77]) : (hat ? [-20, -72, 40, 76] : [-18, -54, 36, 58]);
+  return `<svg class="mp" viewBox="${vb.join(' ')}" width="${(h * vb[2] / vb[3]).toFixed(1)}" height="${h}" aria-hidden="true">${tokenInner(ci, pic, acc)}</svg>`;
 }
-const miniPawn = (ci, h) => tokenSVG(ci, '', h);
-function avatar(ci, pic, size) {
-  if (!pic) return miniPawn(ci, size);
+const miniPawn = (ci, h, acc = 0) => tokenSVG(ci, '', h, acc);
+function avatar(ci, pic, size, acc = 0) {
+  if (!pic) return miniPawn(ci, size, acc);
   return `<span class="ava" style="--pc:${(COLORS[ci] || COLORS[0]).f};width:${size}px;height:${size}px"><img src="${esc(pic)}" alt=""></span>`;
 }
 function picOf(p, g) {
@@ -843,7 +1040,7 @@ function place(el, x, y, s, rot = 0, sx = 1, sy = 1) {
 function ensurePawns(g) {
   const layer = $('#pawns');
   const want = new Map(g.players.map(p => [p.id, p]));
-  const keyOf = p => { const pic = picOf(p, g); return `${p.color}|${p.name}|${pic ? pic.length + pic.slice(-24) : '-'}`; };
+  const keyOf = p => { const pic = picOf(p, g); return `${p.color}|${p.acc}|${p.name}|${pic ? pic.length + pic.slice(-24) : '-'}`; };
   for (const el of [...layer.children]) {
     const p = want.get(el.dataset.id);
     if (!p) { el.remove(); continue; }
@@ -854,7 +1051,7 @@ function ensurePawns(g) {
     const el = document.createElementNS(NS, 'g');
     el.setAttribute('class', 'pawn');
     el.dataset.id = p.id; el.dataset.k = keyOf(p);
-    el.innerHTML = `<title>${esc(p.name)}</title><g class="rings"><ellipse class="ring-out" cx="0" cy="-1" rx="22" ry="8"/><ellipse class="ring-in" cx="0" cy="-1" rx="22" ry="8"/></g><ellipse cx="0" cy="0.5" rx="16.5" ry="5.5" fill="#000000" opacity=".38"/><g class="body">${tokenInner(p.color, picOf(p, g))}</g>`;
+    el.innerHTML = `<title>${esc(p.name)}</title><g class="rings"><ellipse class="ring-out" cx="0" cy="-1" rx="22" ry="8"/><ellipse class="ring-in" cx="0" cy="-1" rx="22" ry="8"/></g><ellipse cx="0" cy="0.5" rx="16.5" ry="5.5" fill="#000000" opacity=".38"/><g class="body">${tokenInner(p.color, picOf(p, g), p.acc)}</g>`;
     layer.appendChild(el);
     const at = S.pp[p.id];
     if (at) place(el, at.x, at.y, at.s);
@@ -957,10 +1154,11 @@ function litArrow(from) {
   const a = document.getElementById('Ga-' + from);
   anim(a, [{ stroke: 'rgba(0,0,0,.45)', strokeWidth: 1.6 }, { stroke: '#FFFFFF', strokeWidth: 9 }, { stroke: 'rgba(0,0,0,.45)', strokeWidth: 1.6 }], { duration: 800, iterations: 2 });
 }
-function floatLabel(txt, up, p) {
+function floatLabel(txt, up, p, kind) {
   const t = document.createElementNS(NS, 'text');
-  t.setAttribute('class', 'fx-label ' + (up ? 'up' : 'down'));
-  t.setAttribute('x', Math.min(1100, Math.max(160, p.x)).toFixed(1));
+  t.setAttribute('class', 'fx-label ' + (kind || (up ? 'up' : 'down')));
+  const hw = txt.length * 16 + 14;
+  t.setAttribute('x', Math.min(1250 - hw, Math.max(10 + hw, p.x)).toFixed(1));
   t.setAttribute('y', Math.max(74, p.y - 30).toFixed(1));
   t.setAttribute('text-anchor', 'middle');
   t.textContent = txt;
@@ -1143,23 +1341,44 @@ function renderDie(n, landed) {
   d.innerHTML = Array.from({ length: 9 }, (_, i) => `<i${FACES[n].includes(i) ? ' class="on"' : ''}></i>`).join('');
   if (landed && !REDUCED) { void d.offsetWidth; d.classList.add('landed'); }
 }
+const CUBE_ROT = { 1: [0, 0], 2: [-90, 0], 3: [0, -90], 4: [0, 90], 5: [90, 0], 6: [0, 180] };
+function buildCube() {
+  $('#cube').innerHTML = [1, 2, 3, 4, 5, 6].map(n => `<div class="face f${n}">${Array.from({ length: 9 }, (_, i) => `<i${FACES[n].includes(i) ? ' class="on"' : ''}></i>`).join('')}</div>`).join('');
+}
 function spinDie(on) {
-  const d = $('#die');
+  const d = $('#die'), stage = $('#die3d'), cube = $('#cube');
   if (on) {
     if (S.spinning) return;
     S.spinning = true; S.spinT = performance.now(); d.classList.add('rolling');
     Sound.fx('dice');
     S.spinTimer = setInterval(() => renderDie(1 + rnd(6)), 90);
+    if (!REDUCED && !document.hidden && S.view === 'game') {
+      clearTimeout(S.cubeT);
+      cube.getAnimations().forEach(a => a.cancel());
+      stage.hidden = false; stage.classList.remove('out'); cube.classList.add('spin');
+    }
   } else {
     if (!S.spinning) return;
     S.spinning = false; clearInterval(S.spinTimer); d.classList.remove('rolling');
   }
 }
+function hideCube(ms) {
+  clearTimeout(S.cubeT);
+  S.cubeT = setTimeout(() => { $('#die3d').classList.add('out'); S.cubeT = setTimeout(() => { $('#die3d').hidden = true; }, 350); }, ms);
+}
 async function landDie(r) {
   spinDie(true);
   await sleep(Math.max(0, (REDUCED ? 0 : 640) - (performance.now() - S.spinT)));
   spinDie(false); renderDie(r, true); Sound.fx('land');
-  await sleep(REDUCED ? 0 : 240);
+  const stage = $('#die3d'), cube = $('#cube');
+  if (!stage.hidden) {
+    cube.classList.remove('spin');
+    const [rx, ry] = CUBE_ROT[r];
+    const end = `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(0deg)`;
+    await anim(cube, [{ transform: `rotateX(${rx + 540}deg) rotateY(${ry + 720}deg) rotateZ(160deg)` }, { transform: end }], { duration: 620, easing: 'cubic-bezier(.15,.85,.3,1)', fill: 'forwards' });
+    hideCube(650);
+  }
+  await sleep(REDUCED ? 0 : 200);
 }
 
 /* ---------- game flow ---------- */
@@ -1191,17 +1410,19 @@ async function runQueue() {
   while (S.queue.length && gen === S.gen) {
     const L = S.queue.shift();
     const hold = new Map([[L.by, L.f]]);
-    for (const q of S.queue) if (!hold.has(q.by)) hold.set(q.by, S.shown[q.by] ?? q.f);
-    S.animText = `${L.n} a dat ${L.r}`; S.animWho = L.by; S.animRid = L.rid;
+    if (L.sw) hold.set(L.sw, L.so);
+    for (const q of S.queue) { if (!hold.has(q.by)) hold.set(q.by, S.shown[q.by] ?? q.f); if (q.sw && !hold.has(q.sw)) hold.set(q.sw, S.shown[q.sw] ?? q.so); }
+    S.animText = `${L.n} a dat ${L.r}`; S.animWho = L.by; S.animRid = L.rid; S.animL = L; S.animRevealed = false;
     layoutPawns(hold);
     if (L.rid === S.myRid) S.pendingRoll = false;
     renderGame();
     try { await animateMove(L, gen); } catch (e) { console.error(e); }
     S.shown[L.by] = L.t;
+    if (L.sw) S.shown[L.sw] = L.j;
   }
   if (gen !== S.gen) return;
   $('#fxTop').replaceChildren();
-  S.animating = false; S.animText = ''; S.animWho = null; S.animRid = null;
+  S.animating = false; S.animText = ''; S.animWho = null; S.animRid = null; S.animL = null;
   layoutPawns(); renderGame(); afterSettle();
 }
 async function animateMove(L, gen) {
@@ -1210,6 +1431,7 @@ async function animateMove(L, gen) {
   if (!el || gen !== S.gen) return;
   el.parentNode.appendChild(el);
   let at = { ...(S.pp[L.by] || startXY(0)) };
+  const home = { ...at };
   const path = pathOf(L);
   if (!path.length) {
     Sound.fx('bonk');
@@ -1224,18 +1446,48 @@ async function animateMove(L, gen) {
     Sound.fx('step', i++);
     await hop(el, at, to); at = to; follow(to);
   }
-  if (L.t !== L.m) {
+  if (L.j !== L.m) {
     await sleep(REDUCED ? 0 : 170);
     if (gen !== S.gen) return;
-    const up = L.t > L.m, to = pawnAt(L.t);
+    const up = L.j > L.m, to = pawnAt(L.j);
     litArrow(L.m);
     floatLabel(up ? 'SUS!' : 'JOS!', up, cellXY(L.m));
     Sound.fx(up ? 'up' : 'down');
     await (JUMPFX[L.m] || genericJump)(el, at, to);
-    place(el, to.x, to.y, to.s); follow(to);
+    place(el, to.x, to.y, to.s); follow(to); at = to;
     await sleep(REDUCED ? 0 : 200);
   }
+  if (gen !== S.gen) return;
+  if (L.x) {
+    // Someone is already there: the roll is cancelled and the pawn walks back.
+    Sound.fx('bonk');
+    floatLabel('OCUPAT!', false, cellXY(L.j));
+    await shake(el, at);
+    await tween(700, t => { const p = along(at, home, ease.inOut(t), 70); place(el, p.x, p.y, at.s, -360 * ease.inOut(t)); });
+    place(el, home.x, home.y, home.s); follow(home);
+    return;
+  }
+  if (L.s) await surpriseFx(el, L, at);
   if (L.t === LAST) await winFx(el, pawnAt(LAST));
+}
+async function surpriseFx(el, L, at) {
+  const c = cellXY(L.j), def = SURPRISES[L.s];
+  Sound.fx('pop');
+  await popSprite('gift', c.x, c.y - 42, 62, 120);
+  S.animRevealed = true; renderMarks();
+  floatLabel(def.label, true, c, 'sur');
+  Sound.fx(L.s === 'skip' ? 'down' : 'up');
+  await popSprite(def.img, c.x, c.y - 46, 66, 450);
+  if (L.s !== 'swap' || !L.sw) return;
+  const other = pawnEl(L.sw), dest = pawnAt(L.so), oa = { ...(S.pp[L.sw] || dest) };
+  Sound.fx('whoosh');
+  if (other) other.parentNode.appendChild(other);
+  await tween(850, t => {
+    const e = ease.inOut(t), p1 = along(at, dest, e, 90), p2 = along(oa, at, e, -70);
+    place(el, p1.x, p1.y, at.s);
+    if (other) place(other, p2.x, p2.y, oa.s);
+  });
+  place(el, dest.x, dest.y, dest.s); follow(dest);
 }
 function afterSettle() {
   const g = S.game; if (!g) return;
@@ -1268,9 +1520,9 @@ async function createGame() {
     await mutate(code, cur => {
       if (cur) return null;
       const now = Date.now();
-      return { v: 2, code, local: false, status: 'lobby', rules: { six: false },
-        players: [{ id: S.pid, name, color: S.prefs.color, pos: 0 }], turn: 0, turnAt: now, rev: 0, wid: '', last: null,
-        log: [{ k: 'create', n: name, c: S.prefs.color, at: now }], winner: null, createdAt: now, updatedAt: now };
+      return { v: 3, code, local: false, status: 'lobby', rules: { six: false, block: true, surprise: true },
+        players: [{ id: S.pid, name, color: S.prefs.color, pos: 0, acc: S.prefs.acc, skip: 0 }], turn: 0, turnAt: now, rev: 0, wid: '', last: null,
+        log: [{ k: 'create', n: name, c: S.prefs.color, at: now }], winner: null, stats: {}, wins: {}, sur: [], createdAt: now, updatedAt: now };
     });
     pushMyPic();
   } catch (e) { writeError(e); }
@@ -1281,27 +1533,28 @@ async function joinGame() {
   const name = cleanName(input ? input.value : myName());
   if (!name) { toast('Scrie o poreclă.'); if (input) input.focus(); return; }
   if (g.local) {
-    const pic = S.localPic, want = S.joinColor;
+    const pic = S.localPic, want = S.joinColor, acc = S.joinAcc || 0;
     await mutate('LOCAL', cur => {
       if (!cur || cur.status !== 'lobby' || cur.players.length >= MAXP) return null;
-      const p = { id: 'L' + rid(), name, color: freeColor(cur, want), pos: 0 };
+      const p = { id: 'L' + rid(), name, color: freeColor(cur, want), pos: 0, acc, skip: 0 };
       if (pic) p.pic = pic;
       cur.players.push(p); cur.rev++;
       return cur;
     });
-    S.localPic = ''; S.joinColor = null;
+    S.localPic = ''; S.joinColor = null; S.joinAcc = 0;
     if (input) { input.value = ''; input.focus(); }
     return;
   }
   S.prefs.name = name; savePrefs(); $('#prefName').value = name;
-  const want = S.joinColor ?? S.prefs.color;
+  const want = S.joinColor ?? S.prefs.color, acc = S.joinAcc ?? S.prefs.acc;
+  if (S.joinAcc != null) { S.prefs.acc = S.joinAcc; savePrefs(); renderPrefPicker(); }
   let full = false;
   try {
     await mutate(g.code, cur => {
       if (!cur || cur.players.some(p => p.id === S.pid)) return null;
       if (cur.players.length >= MAXP) { full = true; return null; }
       const color = freeColor(cur, want), now = Date.now();
-      cur.players.push({ id: S.pid, name, color, pos: 0 });
+      cur.players.push({ id: S.pid, name, color, pos: 0, acc, skip: 0 });
       cur.log.push({ k: 'join', n: name, c: color, at: now });
       trimLog(cur);
       return cur;
@@ -1325,7 +1578,7 @@ async function rematch() {
   catch (e) { writeError(e); }
 }
 async function setRule(key, val) {
-  const g = S.game; if (!g || key !== 'six') return;
+  const g = S.game; if (!g || !['six', 'block', 'surprise'].includes(key)) return;
   try {
     await mutate(g.code, cur => { if (!cur || cur.status !== 'lobby') return null; cur.rules[key] = !!val; cur.rev++; return cur; },
       cur => cur.status !== 'lobby' || cur.rules[key] === !!val);
@@ -1348,19 +1601,30 @@ async function doRoll() {
     setTimeout(() => { if (S.myRid === id && S.pendingRoll) { S.pendingRoll = false; spinDie(false); renderTurn(); } }, 5000);
   } catch (e) { S.pendingRoll = false; spinDie(false); renderDie(S.lastDie); writeError(e); renderTurn(); }
 }
-async function skipTurn() {
-  const g = S.game, who = curP(g); if (!who) return;
-  try {
-    await mutate(g.code, cur => {
-      if (!cur || cur.status !== 'playing') return null;
-      const c = curP(cur);
-      if (!c || c.id !== who.id || Date.now() - cur.turnAt < 25000) return null;
-      cur.turn = (cur.turn + 1) % cur.players.length; cur.turnAt = Date.now();
-      cur.log.push({ k: 'skip', n: c.name, c: c.color, at: cur.turnAt });
-      trimLog(cur);
-      return cur;
-    }, cur => !(cur.status === 'playing' && curP(cur) && curP(cur).id === who.id));
-  } catch (e) { writeError(e); }
+// If nobody rolls for 30 seconds, the game rolls for that player. Every device in the game can do it,
+// staggered by turn order so usually only one does; the version check keeps it to one roll.
+function autoTick() {
+  const g = S.game;
+  if (S.view !== 'game' || !g || g.local || g.status !== 'playing' || S.animating || S.pendingRoll || !meIn(g) || !Bus.up()) return;
+  const cur = curP(g); if (!cur) return;
+  const waited = Date.now() - g.turnAt;
+  if (waited > AUTO_MS - 10500) renderCountdown();
+  const n = g.players.length, me = g.players.findIndex(p => p.id === S.pid);
+  const order = ((me - g.turn) % n + n) % n;
+  const delay = AUTO_MS + order * 3000;
+  if (waited < delay || S.autoKey === g.code + ':' + g.rev) return;
+  S.autoKey = g.code + ':' + g.rev;
+  const who = cur.id, lastRid = g.last ? g.last.rid : null, roll = rnd(6) + 1, id = rid();
+  mutate(g.code, c => {
+    if (!c || c.status !== 'playing' || !curP(c) || curP(c).id !== who || (c.last ? c.last.rid : null) !== lastRid || Date.now() - c.turnAt < AUTO_MS - 2000) return null;
+    return applyRoll(c, who, roll, id, Date.now(), true);
+  }, c => c.log.some(e => e.k === 'move' && e.rid === id)).catch(() => {});
+}
+function renderCountdown() {
+  const g = S.game, el = $('#turnCd');
+  if (!g || g.local || g.status !== 'playing' || S.animating) { el.textContent = ''; return; }
+  const left = Math.ceil((AUTO_MS - (Date.now() - g.turnAt)) / 1000);
+  el.textContent = left > 0 && left <= 10 ? (myTurn(g) ? `Arunc eu pentru tine în ${left}s…` : `Se aruncă automat în ${left}s…`) : '';
 }
 async function leaveGame() {
   const g = S.game; if (!g) return;
@@ -1383,8 +1647,8 @@ async function leaveGame() {
 function openLocal() {
   if (!S.localGame) {
     const now = Date.now(), players = [];
-    if (myName()) { const p = { id: 'L' + rid(), name: myName(), color: S.prefs.color, pos: 0 }; if (S.prefs.pic) p.pic = S.prefs.pic; players.push(p); }
-    S.localGame = { v: 2, code: 'LOCAL', local: true, status: 'lobby', rules: { six: false }, players, turn: 0, turnAt: now, rev: 1, wid: '', last: null, log: [], winner: null, createdAt: now, updatedAt: now };
+    if (myName()) { const p = { id: 'L' + rid(), name: myName(), color: S.prefs.color, pos: 0, acc: S.prefs.acc, skip: 0 }; if (S.prefs.pic) p.pic = S.prefs.pic; players.push(p); }
+    S.localGame = { v: 3, code: 'LOCAL', local: true, status: 'lobby', rules: { six: false, block: true, surprise: true }, players, turn: 0, turnAt: now, rev: 1, wid: '', last: null, log: [], winner: null, stats: {}, wins: {}, sur: [], createdAt: now, updatedAt: now };
     lsSet('local', S.localGame);
   }
   enterGame('LOCAL');
@@ -1399,16 +1663,73 @@ function confirmThen(key, fn) {
   S.confirmT = setTimeout(() => { S.confirm = null; renderDanger(); }, 4000);
 }
 function gameLink(code) { return location.origin + location.pathname + '#' + code; }
-function shareGame() {
+function shareText(code) { return `Hai la Sus-Jos! Codul partidei: ${fmtCode(code)}`; }
+function openShare() {
   const code = S.code; if (!code || code === 'LOCAL') return;
-  const url = gameLink(code), text = `Hai la Sus-Jos! Codul partidei: ${fmtCode(code)}`;
-  const copy = () => {
-    try { navigator.clipboard.writeText(`${text}\n${url}`).then(() => toast('Am copiat linkul. Trimite-l prietenilor.'), () => toast(`Linkul: ${url}`)); }
-    catch { toast(`Linkul: ${url}`); }
-  };
-  if (navigator.share) navigator.share({ title: 'Sus-Jos', text, url }).catch(err => { if (!err || err.name !== 'AbortError') copy(); });
-  else copy();
+  const url = gameLink(code);
+  $('#shareCode').textContent = fmtCode(code);
+  try {
+    const qr = window.qrcode(0, 'M'); qr.addData(url); qr.make();
+    $('#qrBox').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  } catch { $('#qrBox').textContent = url; }
+  $('#shareModal').hidden = false;
+  $('#shareModal [data-act="shareLink"]').focus();
 }
+function closeShare() { $('#shareModal').hidden = true; }
+function copyLink() {
+  const url = gameLink(S.code);
+  try { navigator.clipboard.writeText(`${shareText(S.code)}\n${url}`).then(() => toast('Am copiat linkul. Trimite-l prietenilor.'), () => toast(`Linkul: ${url}`)); }
+  catch { toast(`Linkul: ${url}`); }
+}
+function shareLink() {
+  const url = gameLink(S.code);
+  if (navigator.share) navigator.share({ title: 'Sus-Jos', text: shareText(S.code), url }).catch(err => { if (!err || err.name !== 'AbortError') copyLink(); });
+  else copyLink();
+}
+
+/* ---------- reactions and quick phrases (sent to everyone in the game, never stored) ---------- */
+async function sendReaction(t, i) {
+  const room = S.room, g = S.game;
+  if (!room || !g || g.local || !meIn(g)) return;
+  const now = Date.now();
+  if (now - (S.reactAt || 0) < 700) return;
+  S.reactAt = now;
+  const nonce = rid();
+  S.sent.add(nonce);
+  showReaction(S.pid, t, i);
+  if (t === 'p') $('#phraseRow').hidden = true;
+  Bus.pub(room.topic + '/r', await seal(room, { pid: S.pid, t, i, nonce }), false);
+}
+function showReaction(pid, t, i) {
+  if (document.hidden || S.view !== 'game') return;
+  const g = S.game, p = g && g.players.find(q => q.id === pid);
+  if (!p) return;
+  const at = S.pp[pid] || { x: 630, y: 120, s: 1 }, x = at.x, y = at.y - 64 * at.s;
+  Sound.fx('react');
+  if (t === 'e') {
+    const r = REACTIONS[i]; if (!r) return;
+    const g1 = sprite(r[0], x, y - 20, 64);
+    if (REDUCED || !g1.firstChild.animate) { setTimeout(() => g1.remove(), 1400); return; }
+    g1.firstChild.animate([{ transform: 'translateY(10px) scale(.3)', opacity: 0 }, { transform: 'translateY(-10px) scale(1.15)', opacity: 1, offset: 0.25 }, { transform: 'translateY(-90px) scale(1)', opacity: 0 }], { duration: 1800, easing: 'ease-out' })
+      .finished.then(() => g1.remove(), () => g1.remove());
+    return;
+  }
+  const txt = PHRASES[i]; if (!txt) return;
+  const w = Math.max(90, txt.length * 15.5 + 34), bx = Math.min(1250 - w / 2, Math.max(10 + w / 2, x)), by = Math.max(46, y - 24);
+  const col = COLORS[p.color].f;
+  const b = document.createElementNS(NS, 'g');
+  b.setAttribute('transform', `translate(${f1(bx)} ${f1(by)})`);
+  const tx = Math.min(w / 2 - 18, Math.max(-w / 2 + 18, x - bx));
+  b.innerHTML = `<rect x="${f1(-w / 2)}" y="-26" width="${f1(w)}" height="48" rx="14" fill="#FFFFFF" stroke="${col}" stroke-width="4"/>`
+    + `<path d="M${f1(tx - 9)} 20L${f1(tx)} 36L${f1(tx + 9)} 20" fill="#FFFFFF" stroke="${col}" stroke-width="4" stroke-linejoin="round"/><rect x="${f1(tx - 11)}" y="15" width="22" height="7" fill="#FFFFFF"/>`
+    + `<text class="bubble-text" x="0" y="9" text-anchor="middle"></text>`;
+  b.querySelector('text').textContent = txt;
+  $('#fxTop').appendChild(b);
+  const fade = () => b.remove();
+  if (REDUCED || !b.animate) { setTimeout(fade, 2600); return; }
+  b.animate([{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.85 }, { opacity: 0 }], { duration: 2800 }).finished.then(fade, fade);
+}
+
 function toggleZoom(force) {
   S.zoom = typeof force === 'boolean' ? force : !S.zoom;
   $('#boardScroll').classList.toggle('zoomed', S.zoom);
@@ -1498,14 +1819,19 @@ function toast(msg) {
   clearTimeout(S.toastT);
   S.toastT = setTimeout(() => { t.hidden = true; }, 3600);
 }
-function savePrefs() { lsSet('me', { name: S.prefs.name, color: S.prefs.color, pic: S.prefs.pic }); }
+function savePrefs() { lsSet('me', { name: S.prefs.name, color: S.prefs.color, pic: S.prefs.pic, acc: S.prefs.acc }); }
 function picker(sel, taken, attr) {
   return `<div class="swatches" role="radiogroup" aria-label="Culoarea pionului">${COLORS.map((c, i) => `<button type="button" class="sw" role="radio" aria-checked="${i === sel}" aria-label="${c.n}" title="${c.n}" data-${attr}="${i}"${taken && taken.has(i) ? ' disabled' : ''}>${miniPawn(i, 32)}</button>`).join('')}</div>`;
+}
+function accPicker(sel, attr) {
+  return `<div class="acc-row" role="radiogroup" aria-label="Accesoriu">${ACC.map((a, i) => `<button type="button" class="sw acc" role="radio" aria-checked="${i === sel}" aria-label="${a.n}" title="${a.n}" data-${attr}="${i}">${a.img ? `<img src="img/${a.img}.png" alt="" width="30" height="30">` : '<span class="acc-none">—</span>'}</button>`).join('')}</div>`;
 }
 function renderPrefPicker() {
   $('#prefPicker').innerHTML = picker(S.prefs.color, null, 'pc');
   $('#pcLabel').textContent = 'Culoarea pionului: ' + COLORS[S.prefs.color].n.toLowerCase();
-  $('#prefPicPrev').innerHTML = tokenSVG(S.prefs.color, S.prefs.pic, 62);
+  $('#prefAcc').innerHTML = accPicker(S.prefs.acc, 'pa');
+  $('#paLabel').textContent = 'Accesoriu: ' + ACC[S.prefs.acc].n.toLowerCase();
+  $('#prefPicPrev').innerHTML = tokenSVG(S.prefs.color, S.prefs.pic, 62, S.prefs.acc);
   $('#prefPicClear').hidden = !S.prefs.pic;
 }
 function renderLegend() {
@@ -1548,10 +1874,14 @@ function renderHeader() {
   $('#netDot').classList.toggle('on', Bus.up());
 }
 function moveHTML(e) {
-  const who = `<b>${esc(e.n)}</b>`;
-  if (!e.b && e.m === e.f) return `${who} a dat ${e.r}, dar îi trebuia exact ${LAST - e.f}. Rămâne pe ${e.f}.`;
-  let s = `${who} a dat ${e.r}: ` + (e.b ? `ajunge la 120 și se întoarce la ${e.m}` : `${e.f || 'START'} → ${e.m}`);
-  if (e.t !== e.m) s += e.t > e.m ? `, <span class="up">urcă la ${e.t}</span>` : `, <span class="down">coboară la ${e.t}</span>`;
+  const who = `<b>${esc(e.n)}</b>`, auto = e.a ? ' <span class="muted">(automat)</span>' : '';
+  if (!e.b && e.m === e.f) return `${who} a dat ${e.r}${auto}, dar îi trebuia exact ${LAST - e.f}. Rămâne pe ${e.f}.`;
+  let s = `${who} a dat ${e.r}${auto}: ` + (e.b ? `ajunge la 120 și se întoarce la ${e.m}` : `${e.f || 'START'} → ${e.m}`);
+  if (e.j !== e.m) s += e.j > e.m ? `, <span class="up">urcă la ${e.j}</span>` : `, <span class="down">coboară la ${e.j}</span>`;
+  if (e.x) return s + `. <span class="down">${e.j} era ocupat, așa că rămâne pe ${e.f || 'START'}.</span>`;
+  if (e.s === 'again') return s + '. <span class="sur">Surpriză: mai aruncă o dată!</span>';
+  if (e.s === 'skip') return s + '. <span class="sur">Surpriză: stă o tură.</span>';
+  if (e.s === 'swap') return s + (e.sw ? `. <span class="sur">Surpriză: face schimb de loc cu ${esc(e.sn)}!</span>` : '. <span class="sur">Surpriză: schimb de loc, dar n-are cu cine.</span>');
   return s + (e.t === LAST ? '. <span class="up">A câștigat!</span>' : '.');
 }
 function logHTML(e) {
@@ -1562,6 +1892,7 @@ function logHTML(e) {
     case 'join': return `${n} a intrat în joc.`;
     case 'leave': return `${n} a ieșit din joc.`;
     case 'skip': return `S-a sărit peste ${n}.`;
+    case 'skipped': return `${n} stă o tură.`;
     case 'start': return `Începe jocul! Ordinea: ${order}.`;
     case 'rematch': return `Partidă nouă! Ordinea: ${order}.`;
     default: return '';
@@ -1591,10 +1922,8 @@ function renderTurn() {
       m = !g.local && mine ? 'Rândul tău!' : `Acum aruncă ${esc(cur.name)}`;
       s = g.last ? moveHTML(g.last) : `Primul aruncă ${esc(cur.name)}.`;
       if (mine && cur.pos >= LAST - 6) s += ` <b>Îți trebuie exact ${LAST - cur.pos} ca să ajungi la 120.</b>`;
-      if (inG) {
-        a = `<button class="btn primary roll" type="button" data-act="roll"${canRoll() ? '' : ' disabled'}>Aruncă zarul</button>`;
-        if (!g.local && !mine && Date.now() - g.turnAt > 30000) a += `<button class="btn ghost small" type="button" data-act="skip">Sari peste ${esc(cur.name)}</button>`;
-      } else if (n >= MAXP) s += ' Partida e plină.';
+      if (inG) a = `<button class="btn primary roll" type="button" data-act="roll"${canRoll() ? '' : ' disabled'}>Aruncă zarul</button>`;
+      else if (n >= MAXP) s += ' Partida e plină.';
     } else {
       const w = g.players.find(p => p.id === g.winner);
       m = w ? (!g.local && w.id === S.pid ? 'Ai câștigat!' : `${esc(w.name)} a câștigat!`) : 'Partidă terminată';
@@ -1609,6 +1938,7 @@ function renderTurn() {
   if (S.lastAct !== a) { act.innerHTML = a; S.lastAct = a; }
   act.hidden = !a;
   $('#turnbar').classList.toggle('mine', mine && !!g && !g.local && !S.animating);
+  renderCountdown();
 }
 function renderJoin() {
   const box = $('#joinCard'), g = S.game;
@@ -1624,13 +1954,14 @@ function renderJoin() {
       + (g.local ? '<p class="muted small" style="margin:-4px 0 12px">Toți joacă pe telefonul ăsta, pe rând. Adaugă câte un jucător odată.</p>' : '')
       + `<div class="join-grid"><div><label class="field"><span>Porecla</span><input id="joinName" maxlength="14" autocomplete="off" placeholder="ex. Ana"></label>`
       + `<div class="field"><span>Poza de pe pion (dacă vrei)</span><div class="picrow"><span class="pic-prev" id="joinPicPrev"></span><span class="pic-btns"><button class="btn small" type="button" data-act="pickPic" data-for="${g.local ? 'join' : 'me'}">Alege o poză</button><button class="btn ghost small" type="button" data-act="clearJoinPic" id="joinPicClear">Scoate poza</button></span></div></div></div>`
-      + `<div class="field"><span>Pionul</span><div id="joinPicker"></div></div></div>`
+      + `<div><div class="field"><span>Pionul</span><div id="joinPicker"></div></div><div class="field"><span>Accesoriu</span><div id="joinAcc"></div></div></div></div>`
       + `<button class="btn primary" type="button" data-act="join">${g.local ? 'Adaugă jucătorul' : 'Intră în joc'}</button>`;
     if (!g.local) $('#joinName').value = S.prefs.name || '';
   }
-  const pic = g.local ? S.localPic : S.prefs.pic;
+  const pic = g.local ? S.localPic : S.prefs.pic, acc = S.joinAcc ?? (g.local ? 0 : S.prefs.acc);
   $('#joinPicker').innerHTML = picker(S.joinColor, taken, 'jc');
-  $('#joinPicPrev').innerHTML = tokenSVG(S.joinColor, pic, 62);
+  $('#joinAcc').innerHTML = accPicker(acc, 'ja');
+  $('#joinPicPrev').innerHTML = tokenSVG(S.joinColor, pic, 62, acc);
   $('#joinPicClear').hidden = !pic;
 }
 function renderPlayers() {
@@ -1639,8 +1970,8 @@ function renderPlayers() {
   const cur = g.status === 'playing' && !S.animating ? curP(g) : null;
   const rows = g.players.map(p => {
     const pos = S.shown[p.id] ?? p.pos, on = !g.local && isOnline(p.id);
-    return `<li class="pl${cur && cur.id === p.id ? ' is-turn' : ''}"><span class="chipbg">${avatar(p.color, picOf(p, g), 34)}${g.local ? '' : `<i class="dot${on ? ' on' : ''}" title="${on ? 'e aici acum' : 'nu e aici acum'}"></i>`}</span>`
-      + `<span class="pl-mid"><span class="pl-name">${esc(p.name)}${!g.local && p.id === S.pid ? ' <em>(tu)</em>' : ''}${g.winner === p.id ? '<span class="chip st-win">câștigător</span>' : ''}</span>`
+    return `<li class="pl${cur && cur.id === p.id ? ' is-turn' : ''}"><span class="chipbg">${avatar(p.color, picOf(p, g), 34, p.acc)}${g.local ? '' : `<i class="dot${on ? ' on' : ''}" title="${on ? 'e aici acum' : 'nu e aici acum'}"></i>`}</span>`
+      + `<span class="pl-mid"><span class="pl-name">${esc(p.name)}${!g.local && p.id === S.pid ? ' <em>(tu)</em>' : ''}${g.winner === p.id ? '<span class="chip st-win">câștigător</span>' : ''}${p.skip && g.status === 'playing' ? '<span class="chip st-skip">stă o tură</span>' : ''}</span>`
       + `<span class="bar"><span style="width:${(pos / LAST * 100).toFixed(1)}%;background:${COLORS[p.color].f}"></span></span></span>`
       + `<span class="pl-pos">${pos > 0 ? `<b>${pos}</b>` : 'START'}</span></li>`;
   }).join('');
@@ -1662,11 +1993,14 @@ function renderLog() {
 function renderRules() {
   const g = S.game, box = $('#rulesCard');
   if (!g) { box.innerHTML = ''; return; }
-  const can = g.status === 'lobby' && meIn(g);
+  const can = g.status === 'lobby' && meIn(g), dis = can ? '' : ' disabled';
+  const tg = (key, title, on, off) => `<label class="toggle"><input type="checkbox" data-rule="${key}"${g.rules[key] ? ' checked' : ''}${dis}><span><b>${title}</b><small>${g.rules[key] ? on : off}</small></span></label>`;
   box.innerHTML = '<h3>Reguli</h3>'
     + '<p class="end-rule"><b>La final</b> ai nevoie de exact cât îți lipsește până la 120. Dacă dai mai puțin, înaintezi. Dacă dai mai mult, rămâi pe loc.</p>'
-    + `<label class="toggle"><input type="checkbox" data-rule="six"${g.rules.six ? ' checked' : ''}${can ? '' : ' disabled'}><span><b>La 6 mai arunci o dată</b><small>${g.rules.six ? 'Pornit.' : 'Oprit: fiecare aruncă o singură dată pe tură.'}</small></span></label>`
-    + (g.status === 'lobby' ? '' : '<p class="muted small" style="margin:6px 0 0">Regula cu 6 se poate schimba doar înainte de start.</p>');
+    + tg('block', 'Căsuța ocupată anulează zarul', 'Dacă ajungi pe o căsuță unde stă deja cineva, te întorci unde erai și trece rândul.', 'Oprit: pot sta mai mulți pe aceeași căsuță.')
+    + tg('surprise', 'Căsuțe surpriză', 'Șase căsuțe ascunse: două dau „mai arunci o dată”, două „stai o tură”, două „schimbi locul cu cineva”.', 'Oprit: fără surprize.')
+    + tg('six', 'La 6 mai arunci o dată', 'Pornit.', 'Oprit: fiecare aruncă o singură dată pe tură.')
+    + '<p class="muted small" style="margin:6px 0 0">' + (g.local ? '' : 'Dacă cineva nu aruncă 30 de secunde, jocul aruncă pentru el. ') + (g.status === 'lobby' ? 'Regulile se aleg înainte de start.' : 'Regulile se pot schimba doar înainte de start.') + '</p>';
 }
 function renderDanger() {
   const g = S.game, box = $('#dangerCard');
@@ -1685,9 +2019,56 @@ function renderWin() {
   b.hidden = !w;
   if (w) b.innerHTML = `${avatar(w.color, picOf(w, g), 30)}<span>${esc(w.name)} a câștigat!</span>`;
 }
+const EMPTY_ST = Object.fromEntries(STAT_KEYS.map(k => [k, 0]));
+function renderStats() {
+  const g = S.game, box = $('#statsCard');
+  if (!g || g.status !== 'done' || S.animating) { box.hidden = true; return; }
+  const rows = g.players.map(p => ({ p, s: g.stats[p.id] || EMPTY_ST }));
+  const best = key => rows.reduce((a, r) => (r.s[key] > (a ? a.s[key] : 0) ? r : a), null);
+  const nm = r => `<b>${esc(r.p.name)}</b>`;
+  const lines = [];
+  const lucky = best('us'), unlucky = best('ds'), up = best('mu'), down = best('md'), blocked = best('x');
+  if (lucky) lines.push(`<li><span class="up">Norocosul partidei:</span> ${nm(lucky)}, ${lucky.s.us} căsuțe urcate pe săgeți</li>`);
+  if (unlucky) lines.push(`<li><span class="down">Ghinionistul partidei:</span> ${nm(unlucky)}, ${unlucky.s.ds} căsuțe coborâte</li>`);
+  if (up) lines.push(`<li>Cea mai mare urcare: ${nm(up)}, +${up.s.mu}</li>`);
+  if (down) lines.push(`<li>Cea mai mare cădere: ${nm(down)}, −${down.s.md}</li>`);
+  if (blocked) lines.push(`<li>Cel mai des blocat pe căsuță ocupată: ${nm(blocked)}, de ${blocked.s.x} ori</li>`);
+  box.hidden = false;
+  box.innerHTML = '<h3>Statistici</h3>' + (lines.length ? `<ul class="highlights">${lines.join('')}</ul>` : '')
+    + `<div class="table-wrap"><table class="stats"><thead><tr><th>Jucător</th><th title="Aruncări">Aruncări</th><th title="Urcări pe săgeți">Sus</th><th title="Coborâri pe săgeți">Jos</th><th title="De câte ori a dat 6">De 6</th><th title="Zaruri anulate">Anulate</th></tr></thead><tbody>`
+    + rows.map(r => `<tr><td>${miniPawn(r.p.color, 18, r.p.acc)}<span>${esc(r.p.name)}</span></td><td>${r.s.r}</td><td>${r.s.u}</td><td>${r.s.d}</td><td>${r.s.s6}</td><td>${r.s.x}</td></tr>`).join('')
+    + '</tbody></table></div>';
+}
+function renderRank() {
+  const g = S.game, box = $('#rankCard');
+  const total = g ? g.players.reduce((n, p) => n + (g.wins[p.id] || 0), 0) : 0;
+  if (!g || !total || S.animating) { box.hidden = true; return; }
+  const rows = [...g.players].sort((a, b) => (g.wins[b.id] || 0) - (g.wins[a.id] || 0));
+  const top = g.wins[rows[0].id] || 0;
+  box.hidden = false;
+  box.innerHTML = `<h3>Clasament <span class="count">${total} ${total === 1 ? 'partidă' : 'partide'}</span></h3><ol class="rank">`
+    + rows.map(p => { const w = g.wins[p.id] || 0; return `<li${w && w === top ? ' class="lead"' : ''}><span class="chipbg">${avatar(p.color, picOf(p, g), 30, p.acc)}</span><span class="rk-name">${esc(p.name)}</span><span class="rk-wins"><b>${w}</b> ${w === 1 ? 'victorie' : 'victorii'}</span></li>`; }).join('')
+    + '</ol>';
+}
+// Surprise squares show their icon once someone has landed on them.
+function renderMarks() {
+  const g = S.game, layer = $('#marks');
+  if (!g || !g.sur.length) { layer.replaceChildren(); return; }
+  const hide = new Set(S.queue.filter(q => q.s).map(q => q.j));
+  if (S.animL && S.animL.s && !S.animRevealed) hide.add(S.animL.j);
+  layer.innerHTML = g.sur.filter(x => x[2] && !hide.has(x[0])).map(([n, t]) => {
+    const c = cellXY(n);
+    return `<g transform="translate(${f1(c.x + 32)} ${f1(c.y - 22)})"><circle r="17" fill="#FFFFFF" stroke="#8B3DCC" stroke-width="3"/>${imgTag(SURPRISES[t].img, 26)}</g>`;
+  }).join('');
+}
+function renderReactBar() {
+  const g = S.game, show = !!g && !g.local && meIn(g);
+  $('#reactBar').hidden = !show;
+  if (!show) $('#phraseRow').hidden = true;
+}
 function renderGame() {
   if (S.view !== 'game') return;
-  renderHeader(); renderTurn(); renderJoin(); renderPlayers(); renderLog(); renderRules(); renderDanger(); renderWin();
+  renderHeader(); renderTurn(); renderJoin(); renderPlayers(); renderStats(); renderRank(); renderLog(); renderRules(); renderDanger(); renderWin(); renderMarks(); renderReactBar();
 }
 function confetti() {
   if (REDUCED) return;
@@ -1712,7 +2093,7 @@ function confetti() {
 
 /* ---------- views ---------- */
 function leaveRoom() {
-  if (S.room) { for (const t of ['s', 'p/+', 'h']) Bus.unsub(S.room.topic + '/' + t); }
+  if (S.room) { for (const t of ['s', 'p/+', 'h', 'r']) Bus.unsub(S.room.topic + '/' + t); }
   S.room = null; S.brokerBest = {}; S.pics = new Map(); S.seenAt = new Map();
   clearTimeout(S.missT); clearTimeout(S.healT);
 }
@@ -1722,8 +2103,8 @@ function setHash(code) {
 function enterGame(code) {
   S.gen++;
   leaveRoom();
-  Object.assign(S, { view: 'game', code, game: null, missing: false, firstSnap: true, queue: [], shown: {}, pp: {}, animating: false, animText: '', animWho: null, animRid: null, pendingRoll: false, joinColor: null, localPic: '', lastAct: null, confirm: null });
-  $('#pawns').replaceChildren(); $('#fx').replaceChildren(); $('#fxTop').replaceChildren();
+  Object.assign(S, { view: 'game', code, game: null, missing: false, firstSnap: true, queue: [], shown: {}, pp: {}, animating: false, animText: '', animWho: null, animRid: null, pendingRoll: false, joinColor: null, joinAcc: null, localPic: '', lastAct: null, confirm: null, animL: null });
+  $('#pawns').replaceChildren(); $('#fx').replaceChildren(); $('#fxTop').replaceChildren(); $('#marks').replaceChildren(); $('#phraseRow').hidden = true;
   spinDie(false); renderDie(S.lastDie);
   $('#joinCard').dataset.key = '';
   $('#vLobby').hidden = true; $('#vGame').hidden = false;
@@ -1743,7 +2124,7 @@ async function openGame(code, creating) {
   const room = await deriveRoom(code);
   if (gen !== S.gen) return;
   S.room = room;
-  for (const t of ['s', 'p/+', 'h']) Bus.sub(room.topic + '/' + t);
+  for (const t of ['s', 'p/+', 'h', 'r']) Bus.sub(room.topic + '/' + t);
   ping();
   if (!creating) {
     const check = () => {
@@ -1770,13 +2151,19 @@ function goLobby() {
 document.addEventListener('click', e => {
   const panel = $('#soundPanel');
   if (!panel.hidden && !e.target.closest('#soundPanel, #soundBtn')) toggleSoundPanel(false);
-  const t = e.target.closest('[data-act],[data-open],[data-pc],[data-jc]');
+  if (!$('#shareModal').hidden && e.target.id === 'shareModal') { closeShare(); return; }
+  const t = e.target.closest('[data-act],[data-open],[data-pc],[data-jc],[data-pa],[data-ja],[data-react],[data-phrase]');
   if (!t || t.disabled) return;
   if (t.dataset.open) { openGame(t.dataset.open); return; }
   if (t.dataset.pc != null) { S.prefs.color = int(t.dataset.pc, 0, 9); savePrefs(); renderPrefPicker(); return; }
   if (t.dataset.jc != null) { S.joinColor = int(t.dataset.jc, 0, 9); renderJoin(); return; }
+  if (t.dataset.pa != null) { S.prefs.acc = int(t.dataset.pa, 0, ACC.length - 1); savePrefs(); renderPrefPicker(); if (S.game && !S.game.local && meIn(S.game)) setMyAcc(S.prefs.acc); return; }
+  if (t.dataset.ja != null) { S.joinAcc = int(t.dataset.ja, 0, ACC.length - 1); renderJoin(); return; }
+  if (t.dataset.react != null) { sendReaction('e', int(t.dataset.react, 0, REACTIONS.length - 1)); return; }
+  if (t.dataset.phrase != null) { sendReaction('p', int(t.dataset.phrase, 0, PHRASES.length - 1)); return; }
   const acts = {
-    create: createGame, back: goLobby, share: shareGame, roll: doRoll, start: startGame, join: joinGame, skip: skipTurn,
+    create: createGame, back: goLobby, share: openShare, closeShare, copyLink, shareLink, roll: doRoll, start: startGame, join: joinGame,
+    phrases: () => { $('#phraseRow').hidden = !$('#phraseRow').hidden; }, install: installApp,
     rematch, zoom: () => toggleZoom(), local: openLocal, soundPanel: () => toggleSoundPanel(),
     leave: () => confirmThen('leave', leaveGame), quitLocal: () => confirmThen('quitLocal', quitLocal),
     pickPic: () => { S.picFor = t.dataset.for || 'me'; $('#picInput').click(); },
@@ -1834,17 +2221,47 @@ document.addEventListener('visibilitychange', () => {
 });
 setInterval(ping, 15000);
 setInterval(() => { if (S.view === 'game' && S.game && !S.animating) { if (S.game.status === 'playing') renderTurn(); if (!S.game.local) renderPlayers(); } }, 8000);
+setInterval(autoTick, 1000);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#shareModal').hidden) closeShare(); if (!$('#soundPanel').hidden) toggleSoundPanel(false); } });
+
+/* ---------- installing as an app ---------- */
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function renderInstall() {
+  const row = $('#installRow'), ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (standalone()) { row.hidden = true; return; }
+  if (S.installEvt) { row.hidden = false; $('#installText').textContent = 'Pune Sus-Jos pe ecranul telefonului, ca o aplicație.'; $('#installBtn').hidden = false; return; }
+  if (ios) { row.hidden = false; $('#installText').textContent = 'Pe iPhone: apasă Partajează, apoi „Adaugă pe ecranul principal”, ca să ai Sus-Jos ca aplicație.'; $('#installBtn').hidden = true; return; }
+  row.hidden = true;
+}
+async function installApp() {
+  const ev = S.installEvt; if (!ev) return;
+  S.installEvt = null;
+  ev.prompt();
+  try { await ev.userChoice; } catch {}
+  renderInstall();
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { S.installEvt = null; renderInstall(); toast('Gata, Sus-Jos e pe ecranul telefonului.'); });
+
+// Changing the accessory while already in a game updates your pawn for everyone.
+async function setMyAcc(acc) {
+  const g = S.game; if (!g || g.local) return;
+  try { await mutate(g.code, cur => { const p = cur && cur.players.find(q => q.id === S.pid); if (!p || p.acc === acc) return null; p.acc = acc; return cur; }); } catch (e) { writeError(e); }
+}
 
 /* ---------- boot ---------- */
 (function boot() {
   const p = lsGet('me') || {};
-  S.prefs = { name: cleanName(p.name), color: int(p.color, 0, 9), pic: validPic(p.pic) ? p.pic : '' };
+  S.prefs = { name: cleanName(p.name), color: int(p.color, 0, 9), pic: validPic(p.pic) ? p.pic : '', acc: int(p.acc, 0, ACC.length - 1) };
   let pid = lsGet('pid');
   if (typeof pid !== 'string' || !ID_RE.test(pid)) { pid = 'p' + rid(); lsSet('pid', pid); }
   S.pid = pid;
   const lg = lsGet('local');
   if (lg && validGame(lg) && lg.code === 'LOCAL') S.localGame = clean({ ...lg, local: true });
   $('#art').innerHTML = boardSVG();
+  buildCube();
+  renderInstall();
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   $('#heroBoard').innerHTML = boardSVG();
   Sound.load();
   idb.get('song').then(blob => { if (blob) idb.get('songName').then(n => { Sound.setSong(blob, n || 'melodia ta'); renderSound(); }); }).catch(() => {});

@@ -13,7 +13,15 @@ Jocul de pe tabla de circ cu 120 de căsuțe, online, pentru până la 10 jucăt
 
 Dai cu zarul și muți pionul. Dacă te oprești pe o căsuță galbenă de unde pleacă o săgeată, mergi pe săgeată: urci sau cobori, fiecare săgeată cu animația ei. La final ai nevoie de exact cât îți lipsește până la 120: dacă dai mai puțin, înaintezi; dacă dai mai mult, rămâi pe loc.
 
-Dacă stați toți la aceeași masă, **Joc pe un telefon** vă lasă să jucați pe rând pe un singur telefon.
+Mai sunt câteva reguli, pe care le poți opri înainte de start:
+
+- **Căsuța ocupată:** dacă ajungi pe o căsuță unde stă deja cineva, zarul se anulează. Te întorci unde erai și trece rândul.
+- **Căsuțe surpriză:** șase căsuțe ascunse. La două mai arunci o dată, la două stai o tură, la două schimbi locul cu cineva.
+- **Aruncarea automată:** dacă nu arunci 30 de secunde, jocul aruncă pentru tine.
+
+În timpul jocului poți trimite reacții și fraze rapide care apar deasupra pionului tău. La final vezi statisticile partidei și clasamentul pe toate partidele jucate cu același cod. Fiecare își poate pune o culoare, o poză și un accesoriu pe pion.
+
+Dacă stați toți la aceeași masă, **Joc pe un telefon** vă lasă să jucați pe rând pe un singur telefon. Din butonul **Trimite** apare și un cod QR, ca să intre cine e lângă tine. Pe telefon poți pune Sus-Jos pe ecranul principal, ca aplicație.
 
 ## Cum funcționează
 
@@ -23,4 +31,4 @@ Mutările trec prin două servere MQTT publice și gratuite (EMQX și HiveMQ), c
 
 ## Imagini
 
-Efectele din animații (racheta, baloanele, umbrela, papagalul, trofeul și altele) sunt [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) de la Microsoft, folosite sub licența MIT (vezi `img/LICENSE-fluentui-emoji.txt`).
+Efectele din animații, reacțiile și accesoriile pionilor sunt [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) de la Microsoft, folosite sub licența MIT (vezi `img/LICENSE-fluentui-emoji.txt`). Codul QR e generat cu [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) de Kazuhiko Arase (MIT).

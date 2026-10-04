@@ -1,0 +1,16 @@
+{
+  "name": "Sus-Jos",
+  "short_name": "Sus-Jos",
+  "description": "Tabla de circ cu 120 de căsuțe, zar și săgeți care urcă și coboară. Până la 10 jucători, fără cont.",
+  "lang": "ro",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0A1510",
+  "theme_color": "#0B7A41",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
